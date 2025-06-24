@@ -1,0 +1,57 @@
+{% include 'includes/header.html' %}
+<div class="container py-4">
+  <h1>Transportistas</h1>
+  <a href="{{ url_for('transportistas.crear') }}" class="btn btn-primary mb-3">Crear nuevo</a>
+  <table id="tablaTransportistas" class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombres</th>
+        <th>Apellidos</th>
+        <th>Teléfono</th>
+        <th>Dirección</th>
+        <th>Email</th>
+        <th>Documento CIF</th>
+        <th>Código Postal</th>
+        <th>Fecha registro</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in transportistas %}
+      <tr>
+        <td>{{ t.id }}</td>
+        <td>{{ t.nombres }}</td>
+        <td>{{ t.apellidos }}</td>
+        <td>{{ t.telefono or '' }}</td>
+        <td>{{ t.direccion or '' }}</td>
+        <td>{{ t.email or '' }}</td>
+        <td>{{ t.documento_cif or '' }}</td>
+        <td>{{ t.codigo_postal or '' }}</td>
+        <td>{{ t.fecha_registro }}</td>
+        <td>{{ 'Sí' if t.activo else 'No' }}</td>
+        <td>
+          <a href="{{ url_for('transportistas.editar', transportista_id=t.id) }}" class="btn btn-sm btn-warning">Editar</a>
+          <form action="{{ url_for('transportistas.eliminar', transportista_id=t.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar transportista?')">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#tablaTransportistas').DataTable({
+      "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json"
+      }
+    });
+  });
+</script>
+{% include 'includes/footer.html' %}

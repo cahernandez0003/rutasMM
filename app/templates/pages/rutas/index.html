@@ -1,0 +1,49 @@
+{% include 'includes/header.html' %}
+<div class="container py-4">
+  <h1>Listado de Rutas</h1>
+  <a href="{{ url_for('rutas.crear') }}" class="btn btn-primary mb-3">Crear nueva ruta</a>
+  <table id="tablaRutas" class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Fecha de creación</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ruta in rutas %}
+      <tr>
+        <td>{{ ruta.id }}</td>
+        <td>{{ ruta.codigo_ruta }}</td>
+        <td>{{ ruta.nombre_ruta }}</td>
+        <td>{{ ruta.fecha_creacion }}</td>
+        <td>{{ 'Sí' if ruta.activo else 'No' }}</td>
+        <td>
+          <a href="{{ url_for('rutas.editar', ruta_id=ruta.id) }}" class="btn btn-sm btn-warning">Editar</a>
+          <form action="{{ url_for('rutas.eliminar', ruta_id=ruta.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar ruta?')">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- DataTables CDN -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#tablaRutas').DataTable({
+      "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json"
+      }
+    });
+  });
+</script>
+{% include 'includes/footer.html' %}
