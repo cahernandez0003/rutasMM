@@ -1,0 +1,53 @@
+{% include 'includes/header.html' %}
+<div class="container py-4">
+  <h1>Usuarios</h1>
+  <a href="{{ url_for('usuarios.crear') }}" class="btn btn-primary mb-3">Crear nuevo</a>
+  <table id="tablaUsuarios" class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombres</th>
+        <th>Apellidos</th>
+        <th>Nickname</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Último acceso</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in usuarios %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.nombres }}</td>
+        <td>{{ u.apellidos }}</td>
+        <td>{{ u.nickname }}</td>
+        <td>{{ u.email or '' }}</td>
+        <td>{{ u.rol or '' }}</td>
+        <td>{{ u.last_login or '' }}</td>
+        <td>{{ 'Sí' if u.activo else 'No' }}</td>
+        <td>
+          <a href="{{ url_for('usuarios.editar', usuario_id=u.id) }}" class="btn btn-sm btn-warning">Editar</a>
+          <form action="{{ url_for('usuarios.eliminar', usuario_id=u.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar usuario?')">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#tablaUsuarios').DataTable({
+      "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json"
+      }
+    });
+  });
+</script>
+{% include 'includes/footer.html' %}
