@@ -1,19 +1,19 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/">Inicio</a>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: linear-gradient(90deg, #1c2331 0%, #4e69a2 100%); box-shadow: 0 2px 12px rgba(30,40,60,0.13); height: 56px;">
+  <div class="container-fluid py-0">
+    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
+      <!-- <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="36" class="me-2"> -->
+      Mimoun <span style="font-size:0.9em; font-weight:400; margin-left:3px;">market</span>
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="/rutas">Rutas</a></li>
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="50" height="36">
-
-        <li class="nav-item"><a class="nav-link" href="/transportistas">Transportistas</a></li>
-        <li class="nav-item"><a class="nav-link" href="/usuarios">Usuarios</a></li>
-        <li class="nav-item"><a class="nav-link" href="/albaranes_rutas">Albaranes de rutas</a></li>
+      <ul class="navbar-nav ms-auto gap-2">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('rutas.index') }}">Rutas</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('transportistas.index') }}">Transportistas</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('usuarios.index') }}">Usuarios</a></li>
       </ul>
     </div>
   </div>
 </nav>
-<div style="height: 56px;"></div>

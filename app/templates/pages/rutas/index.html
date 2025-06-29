@@ -5,10 +5,10 @@
   <table id="tablaRutas" class="table table-bordered table-striped">
     <thead>
       <tr>
-        <th>ID</th>
+        <!-- <th>ID</th> -->
         <th>Código</th>
         <th>Nombre</th>
-        <th>Fecha de creación</th>
+        <!-- <th>Fecha de creación</th> -->
         <th>Activo</th>
         <th>Acciones</th>
       </tr>
@@ -16,10 +16,10 @@
     <tbody>
       {% for ruta in rutas %}
       <tr>
-        <td>{{ ruta.id }}</td>
+        <!-- <td>{{ ruta.id }}</td> -->
         <td>{{ ruta.codigo_ruta }}</td>
         <td>{{ ruta.nombre_ruta }}</td>
-        <td>{{ ruta.fecha_creacion }}</td>
+        <!-- <td>{{ ruta.fecha_creacion }}</td> -->
         <td>{{ 'Sí' if ruta.activo else 'No' }}</td>
         <td>
           <a href="{{ url_for('rutas.editar', ruta_id=ruta.id) }}" class="btn btn-sm btn-warning">Editar</a>

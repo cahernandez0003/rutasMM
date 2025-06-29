@@ -5,15 +5,14 @@
   <table id="tablaTransportistas" class="table table-bordered table-striped">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Nombres</th>
-        <th>Apellidos</th>
+        <!-- <th>ID</th> -->
+        <th>Nombre</th>
         <th>Teléfono</th>
         <th>Dirección</th>
         <th>Email</th>
         <th>Documento CIF</th>
         <th>Código Postal</th>
-        <th>Fecha registro</th>
+        <!-- <th>Fecha registro</th> -->
         <th>Activo</th>
         <th>Acciones</th>
       </tr>
@@ -21,15 +20,14 @@
     <tbody>
       {% for t in transportistas %}
       <tr>
-        <td>{{ t.id }}</td>
-        <td>{{ t.nombres }}</td>
-        <td>{{ t.apellidos }}</td>
+        <!-- <td>{{ t.id }}</td> -->
+        <td>{{ t.nombres }} {{ t.apellidos }}</td>
         <td>{{ t.telefono or '' }}</td>
         <td>{{ t.direccion or '' }}</td>
         <td>{{ t.email or '' }}</td>
         <td>{{ t.documento_cif or '' }}</td>
         <td>{{ t.codigo_postal or '' }}</td>
-        <td>{{ t.fecha_registro }}</td>
+        <!-- <td>{{ t.fecha_registro }}</td> -->
         <td>{{ 'Sí' if t.activo else 'No' }}</td>
         <td>
           <a href="{{ url_for('transportistas.editar', transportista_id=t.id) }}" class="btn btn-sm btn-warning">Editar</a>
