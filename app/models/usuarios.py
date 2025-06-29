@@ -67,3 +67,16 @@ def delete_usuario(usuario_id):
     conn.commit()
     cur.close()
     conn.close()
+
+def get_usuario_by_nickname(nickname):
+    conn = get_postgresql_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM usuarios WHERE nickname = %s;", (nickname,))
+    columns = [desc[0] for desc in cur.description]
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if row:
+        return dict(zip(columns, row))
+    return None
+

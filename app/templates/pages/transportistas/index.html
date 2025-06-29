@@ -30,7 +30,7 @@
         <!-- <td>{{ t.fecha_registro }}</td> -->
         <td>{{ 'Sí' if t.activo else 'No' }}</td>
         <td>
-          <a href="{{ url_for('transportistas.editar', transportista_id=t.id) }}" class="btn btn-sm btn-warning">Editar</a>
+          <a href="{{ url_for('transportistas.editar', transportista_id=t.id) }}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i>Editar</a>
           <form action="{{ url_for('transportistas.eliminar', transportista_id=t.id) }}" method="post" style="display:inline;">
             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar transportista?')">Eliminar</button>
           </form>
@@ -48,7 +48,12 @@
     $('#tablaTransportistas').DataTable({
       "language": {
         "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json"
-      }
+      },
+      dom: 'Bfrtip',
+      buttons: [
+        { extend: 'excelHtml5', text: 'Exportar Excel' },
+        { extend: 'pdfHtml5', text: 'Exportar PDF' }
+      ]
     });
   });
 </script>

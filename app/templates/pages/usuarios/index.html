@@ -28,7 +28,7 @@
         <td>{{ u.last_login or '' }}</td>
         <td>{{ 'Sí' if u.activo else 'No' }}</td>
         <td>
-          <a href="{{ url_for('usuarios.editar', usuario_id=u.id) }}" class="btn btn-sm btn-warning">Editar</a>
+          <a href="{{ url_for('usuarios.editar', usuario_id=u.id) }}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i>Editar</a>
           <form action="{{ url_for('usuarios.eliminar', usuario_id=u.id) }}" method="post" style="display:inline;">
             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar usuario?')">Eliminar</button>
           </form>
@@ -46,7 +46,12 @@
     $('#tablaUsuarios').DataTable({
       "language": {
         "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json"
-      }
+      },
+      dom: 'Bfrtip',
+      buttons: [
+        { extend: 'excelHtml5', text: 'Exportar Excel' },
+        { extend: 'pdfHtml5', text: 'Exportar PDF' }
+      ]
     });
   });
 </script>

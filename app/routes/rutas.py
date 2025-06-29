@@ -1,14 +1,19 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.models.rutas import get_all_rutas, get_ruta_by_id, create_ruta, update_ruta, delete_ruta
+from app.decorators import requiere_login, requiere_rol
 
 rutas_bp = Blueprint('rutas', __name__, template_folder='../templates/pages/rutas')
 
 @rutas_bp.route('/')
+@requiere_login
+@requiere_rol('supus', 'admin')
 def index():
     rutas = get_all_rutas()
     return render_template('rutas/index.html', rutas=rutas, title="Rutas")
 
 @rutas_bp.route('/crear', methods=['GET', 'POST'])
+@requiere_login
+@requiere_rol('supus', 'admin')
 def crear():
     if request.method == 'POST':
         codigo = request.form['codigo_ruta']
@@ -22,6 +27,8 @@ def crear():
     return render_template('rutas/form.html', action="Crear", ruta=None)
 
 @rutas_bp.route('/editar/<int:ruta_id>', methods=['GET', 'POST'])
+@requiere_login
+@requiere_rol('supus', 'admin')
 def editar(ruta_id):
     ruta = get_ruta_by_id(ruta_id)
     if not ruta:
@@ -40,6 +47,8 @@ def editar(ruta_id):
     return render_template('rutas/form.html', action="Editar", ruta=ruta)
 
 @rutas_bp.route('/eliminar/<int:ruta_id>', methods=['POST'])
+@requiere_login
+@requiere_rol('supus', 'admin')
 def eliminar(ruta_id):
     try:
         delete_ruta(ruta_id)
