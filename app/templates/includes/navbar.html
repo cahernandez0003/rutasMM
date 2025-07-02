@@ -12,7 +12,8 @@
         <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('rutas.index') }}">Rutas</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('transportistas.index') }}">Transportistas</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('usuarios.index') }}">Usuarios</a></li>{% if session.usuario_nickname %}
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('usuarios.index') }}">Usuarios</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('albaranes.index') }}">Albaranes</a></li>{% if session.usuario_nickname %}
         <li class="nav-item">
           <span class="nav-link disabled">Usuario: {{ session.usuario_nickname }} ({{ session.usuario_rol }})</span>
         </li>

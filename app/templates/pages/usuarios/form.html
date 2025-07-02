@@ -2,52 +2,59 @@
 <div class="container py-4">
   <h1>{{ action }} Usuario</h1>
   <form method="post">
-    <div class="mb-3">
-      <label for="nombres" class="form-label">Nombres</label>
-      <input type="text" class="form-control" name="nombres" id="nombres"
-             value="{{ u.nombres if u else '' }}" required>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="nombres">Nombres</label>
+        <input type="text" class="form-control" id="nombres" name="nombres" value="{{ u.nombres if u else '' }}" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="apellidos">Apellidos</label>
+        <input type="text" class="form-control" id="apellidos" name="apellidos" value="{{ u.apellidos if u else '' }}" required>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label for="nickname">Usuario</label>
+        <input type="text" class="form-control" id="nickname" name="nickname" value="{{ u.nickname if u else '' }}" required>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" name="email" value="{{ u.email if u else '' }}" required>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="rol">Rol</label>
+        <select class="form-select" id="rol" name="rol" required>
+          <option value="">Seleccione un rol</option>
+          <option value="admin" {{ 'selected' if u and u.rol == 'admin' else '' }}>Administrador</option>
+          <option value="supus" {{ 'selected' if u and u.rol == 'supus' else '' }}>Supervisor</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="password">Contraseña {{ '(dejar en blanco para mantener)' if u else '' }}</label>
+        <input type="password" class="form-control" id="password" name="password" {{ 'required' if not u else '' }}>
+      </div>
     </div>
     <div class="mb-3">
-      <label for="apellidos" class="form-label">Apellidos</label>
-      <input type="text" class="form-control" name="apellidos" id="apellidos"
-             value="{{ u.apellidos if u else '' }}" required>
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="requiere_cambio_pw" name="requiere_cambio_pw" 
+               {{ 'checked' if u and u.requiere_cambio_pw else '' }}>
+        <label class="form-check-label" for="requiere_cambio_pw">Requiere cambio de contraseña</label>
+      </div>
     </div>
+    {% if u %}
     <div class="mb-3">
-      <label for="nickname" class="form-label">Nickname</label>
-      <input type="text" class="form-control" name="nickname" id="nickname"
-             value="{{ u.nickname if u else '' }}" required>
-    </div>
-    <div class="mb-3">
-      <label for="password" class="form-label">Contraseña</label>
-      <input type="password" class="form-control" name="password" id="password" {% if action=='Crear' %}required{% endif %}>
-      {% if action == 'Editar' %}
-        <small class="text-muted">Dejar en blanco para mantener la contraseña actual</small>
-      {% endif %}
-    </div>
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" name="requiere_cambio_pw" id="requiere_cambio_pw"
-             {% if u and u.requiere_cambio_pw %}checked{% endif %}>
-      <label class="form-check-label" for="requiere_cambio_pw">Requiere cambio de contraseña</label>
-    </div>
-    <div class="mb-3">
-      <label for="email" class="form-label">Email</label>
-      <input type="email" class="form-control" name="email" id="email"
-             value="{{ u.email if u else '' }}">
-    </div>
-    <div class="mb-3">
-      <label for="rol" class="form-label">Rol</label>
-      <input type="text" class="form-control" name="rol" id="rol"
-             value="{{ u.rol if u else '' }}">
-    </div>
-    {% if action == 'Editar' %}
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" name="activo" id="activo"
-             {% if u and u.activo %}checked{% endif %}>
-      <label class="form-check-label" for="activo">Activo</label>
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="activo" name="activo" {{ 'checked' if u.activo else '' }}>
+        <label class="form-check-label" for="activo">Activo</label>
+      </div>
     </div>
     {% endif %}
-    <button type="submit" class="btn btn-success">{{ action }}</button>
-    <a href="{{ url_for('usuarios.index') }}" class="btn btn-secondary">Volver</a>
+    <div class="mt-4">
+      <button type="submit" class="btn btn-success">Guardar</button>
+      <a href="{{ url_for('usuarios.index') }}" class="btn btn-secondary">Volver</a>
+    </div>
   </form>
 </div>
 {% include 'includes/footer.html' %}

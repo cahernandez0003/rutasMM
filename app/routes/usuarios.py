@@ -6,14 +6,14 @@ from app.models.usuarios import (
 from werkzeug.security import generate_password_hash
 from app.decorators import requiere_login, requiere_rol
 
-usuarios_bp = Blueprint('usuarios', __name__, template_folder='../templates/pages/usuarios')
+usuarios_bp = Blueprint('usuarios', __name__)
 
 @usuarios_bp.route('/')
 @requiere_login
 @requiere_rol('supus', 'admin')
 def index():
     usuarios = get_all_usuarios()
-    return render_template('usuarios/index.html', usuarios=usuarios, title="Usuarios")
+    return render_template('pages/usuarios/index.html', usuarios=usuarios, title="Usuarios")
 
 @usuarios_bp.route('/crear', methods=['GET', 'POST'])
 @requiere_login
@@ -35,7 +35,7 @@ def crear():
             return redirect(url_for('usuarios.index'))
         except Exception as e:
             flash(f'Error: {e}', 'danger')
-    return render_template('usuarios/form.html', action="Crear", u=None)
+    return render_template('pages/usuarios/form.html', action="Crear", u=None)
 
 @usuarios_bp.route('/editar/<int:usuario_id>', methods=['GET', 'POST'])
 @requiere_login
@@ -62,7 +62,7 @@ def editar(usuario_id):
             return redirect(url_for('usuarios.index'))
         except Exception as e:
             flash(f'Error: {e}', 'danger')
-    return render_template('usuarios/form.html', action="Editar", u=u)
+    return render_template('pages/usuarios/form.html', action="Editar", u=u)
 
 @usuarios_bp.route('/eliminar/<int:usuario_id>', methods=['POST'])
 @requiere_login

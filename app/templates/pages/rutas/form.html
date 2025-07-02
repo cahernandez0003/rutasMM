@@ -2,25 +2,31 @@
 <div class="container py-4">
   <h1>{{ action }} Ruta</h1>
   <form method="post">
-    <div class="mb-3">
-      <label for="codigo_ruta" class="form-label">Código</label>
-      <input type="text" class="form-control" name="codigo_ruta" id="codigo_ruta"
-             value="{{ ruta.codigo_ruta if ruta else '' }}" required>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label for="codigo_ruta">Código</label>
+        <input type="text" class="form-control" id="codigo_ruta" name="codigo_ruta" 
+               value="{{ ruta.codigo_ruta if ruta else '' }}" required>
+      </div>
+      <div class="col-md-8 mb-3">
+        <label for="nombre_ruta">Nombre</label>
+        <input type="text" class="form-control" id="nombre_ruta" name="nombre_ruta" 
+               value="{{ ruta.nombre_ruta if ruta else '' }}" required>
+      </div>
     </div>
+    {% if ruta %}
     <div class="mb-3">
-      <label for="nombre_ruta" class="form-label">Nombre</label>
-      <input type="text" class="form-control" name="nombre_ruta" id="nombre_ruta"
-             value="{{ ruta.nombre_ruta if ruta else '' }}" required>
-    </div>
-    {% if action == 'Editar' %}
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" name="activo" id="activo"
-             {% if ruta and ruta.activo %}checked{% endif %}>
-      <label class="form-check-label" for="activo">Activo</label>
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="activo" name="activo" 
+               {{ 'checked' if ruta.activo else '' }}>
+        <label class="form-check-label" for="activo">Activo</label>
+      </div>
     </div>
     {% endif %}
-    <button type="submit" class="btn btn-success">{{ action }}</button>
-    <a href="{{ url_for('rutas.index') }}" class="btn btn-secondary">Volver</a>
+    <div class="mt-4">
+      <button type="submit" class="btn btn-success">Guardar</button>
+      <a href="{{ url_for('rutas.index') }}" class="btn btn-secondary">Volver</a>
+    </div>
   </form>
 </div>
 {% include 'includes/footer.html' %}

@@ -2,14 +2,14 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.models.rutas import get_all_rutas, get_ruta_by_id, create_ruta, update_ruta, delete_ruta
 from app.decorators import requiere_login, requiere_rol
 
-rutas_bp = Blueprint('rutas', __name__, template_folder='../templates/pages/rutas')
+rutas_bp = Blueprint('rutas', __name__)
 
 @rutas_bp.route('/')
 @requiere_login
 @requiere_rol('supus', 'admin')
 def index():
     rutas = get_all_rutas()
-    return render_template('rutas/index.html', rutas=rutas, title="Rutas")
+    return render_template('pages/rutas/index.html', rutas=rutas, title="Rutas")
 
 @rutas_bp.route('/crear', methods=['GET', 'POST'])
 @requiere_login
@@ -24,7 +24,7 @@ def crear():
             return redirect(url_for('rutas.index'))
         except Exception as e:
             flash(f'Error: {e}', 'danger')
-    return render_template('rutas/form.html', action="Crear", ruta=None)
+    return render_template('pages/rutas/form.html', action="Crear", ruta=None)
 
 @rutas_bp.route('/editar/<int:ruta_id>', methods=['GET', 'POST'])
 @requiere_login
@@ -44,7 +44,7 @@ def editar(ruta_id):
             return redirect(url_for('rutas.index'))
         except Exception as e:
             flash(f'Error: {e}', 'danger')
-    return render_template('rutas/form.html', action="Editar", ruta=ruta)
+    return render_template('pages/rutas/form.html', action="Editar", ruta=ruta)
 
 @rutas_bp.route('/eliminar/<int:ruta_id>', methods=['POST'])
 @requiere_login

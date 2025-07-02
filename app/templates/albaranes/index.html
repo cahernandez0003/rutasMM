@@ -1,0 +1,22 @@
+{% include 'includes/header.html' %}
+<div class="container py-4">
+  <h1>Listado de Albaranes</h1>
+  <a href="{{ url_for('albaranes.nuevo') }}" class="btn btn-primary mb-3">Crear nuevo albarán</a>
+  
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    Funcionalidad de albaranes en desarrollo. Próximamente podrás ver el listado completo de albaranes aquí.
+  </div>
+  
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Funciones disponibles:</h5>
+      <ul>
+        <li>Crear nuevo albarán de ruta</li>
+        <li>Gestionar líneas de albarán</li>
+        <li>Exportar albaranes</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% include 'includes/footer.html' %} 

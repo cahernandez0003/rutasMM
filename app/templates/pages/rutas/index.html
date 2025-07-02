@@ -22,9 +22,13 @@
         <!-- <td>{{ ruta.fecha_creacion }}</td> -->
         <td>{{ 'Sí' if ruta.activo else 'No' }}</td>
         <td>
-          <a href="{{ url_for('rutas.editar', ruta_id=ruta.id) }}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i>Editar</a>
+          <a href="{{ url_for('rutas.editar', ruta_id=ruta.id) }}" class="btn btn-warning btn-sm">
+            <i class="bi bi-pencil"></i> Editar
+          </a>
           <form action="{{ url_for('rutas.eliminar', ruta_id=ruta.id) }}" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar ruta?')">Eliminar</button>
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar ruta?')">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
           </form>
         </td>
       </tr>

@@ -1,1 +1,200 @@
-# Bitácora del sistema de rutas logísticas
+# Bitácora de Desarrollo - Sistema de Gestión de Rutas
+Fecha: 2025-07-02
+
+## Correcciones y Mejoras Implementadas
+
+### 1. Estructura de Plantillas
+- Se corrigió la estructura de directorios de las plantillas
+- Se movieron las plantillas a sus ubicaciones correctas:
+  * /templates/pages/rutas/
+  * /templates/pages/usuarios/
+  * /templates/pages/transportistas/
+  * /templates/pages/error.html
+
+### 2. Correcciones en Blueprints
+- Se actualizaron las rutas en los archivos:
+  * routes/rutas.py
+  * routes/usuarios.py
+  * routes/transportistas.py
+- Se eliminaron los template_folder redundantes
+- Se actualizaron las rutas de render_template para usar 'pages/'
+
+### 3. Gestión de Errores
+- Se implementó manejo de errores 404 y 500
+- Se creó plantilla error.html para mostrar errores amigables
+- Se mejoró el sistema de mensajes flash
+
+### 4. Dependencias Actualizadas
+- Se agregaron nuevas dependencias al requirements.txt:
+  * Flask-WTF y WTForms para formularios
+  * Flask-Login para autenticación
+  * Flask-SQLAlchemy y SQLAlchemy para ORM
+  * Flask-Migrate para migraciones
+  * Flask-Mail para envío de correos
+  * Flask-Bootstrap para diseño
+  * Flask-Moment para fechas
+  * Flask-Babel para internacionalización
+  * Flask-Assets para manejo de assets
+  * python-dotenv para variables de entorno
+
+### 5. Seguridad
+- Se implementó sistema de login requerido
+- Se agregó control de roles (supus, admin)
+- Se mejoró el manejo de contraseñas con hashing
+
+### 6. Base de Datos
+- PostgreSQL configurado como BD principal
+- SQL Server como BD opcional (pendiente de configurar)
+- Se crearon modelos para:
+  * Usuarios
+  * Rutas
+  * Transportistas
+  * Albaranes
+
+### 7. Interfaz de Usuario
+- Se implementó diseño responsive con Bootstrap
+- Se agregaron DataTables para tablas
+- Se mejoraron formularios con validación
+- Se agregaron iconos y mejoras visuales
+
+### 8. Scripts de Utilidad
+- start_app.py: Script mejorado de inicio
+- test_app.py: Suite de pruebas
+- run.py: Script de desarrollo
+
+### Pendiente
+- Configurar conexión a SQL Server
+- Implementar más pruebas unitarias
+- Mejorar documentación de API
+- Optimizar consultas a base de datos
+
+## Notas Importantes
+- La aplicación requiere Python 3.12+
+- Se recomienda usar entorno virtual
+- Configurar variables de entorno en .env
+- Ejecutar migraciones antes de iniciar
+
+## Evaluación Técnica y Recomendaciones (Pre-Desarrollo de Albaranes)
+Fecha: 2025-07-02
+
+### Análisis de Estado Actual (6/10)
+
+#### 1. Arquitectura y Estructura ✅
+- Fortalezas:
+  * Blueprints implementados correctamente
+  * Separación de responsabilidades clara
+  * Estructura de directorios lógica
+- Mejoras Necesarias:
+  * Implementar patrón repositorio
+  * Agregar capa de servicios
+  * Considerar Factory Pattern
+
+#### 2. Seguridad 🚨
+- Fortalezas:
+  * Autenticación básica implementada
+  * Control de roles existente
+  * Hashing de contraseñas
+- Mejoras Críticas:
+  * Implementar CSRF protection
+  * Agregar rate limiting
+  * Configurar headers de seguridad
+  * Mejorar validación de datos
+
+#### 3. Base de Datos 🔄
+- Fortalezas:
+  * PostgreSQL configurado
+  * Modelos definidos
+- Mejoras Necesarias:
+  * Implementar sistema de migraciones
+  * Agregar manejo de transacciones
+  * Optimizar consultas
+  * Resolver conexión SQL Server
+
+#### 4. Errores y Logging ⚠️
+- Fortalezas:
+  * Plantilla de error personalizada
+  * Manejo básico de excepciones
+- Mejoras Necesarias:
+  * Implementar logging estructurado
+  * Agregar monitoreo de errores
+  * Mejorar manejo de excepciones
+
+#### 5. Frontend/UX 🎨
+- Fortalezas:
+  * Bootstrap responsive
+  * DataTables implementadas
+  * Validación en formularios
+- Mejoras Necesarias:
+  * Minificar assets
+  * Implementar cache-busting
+  * Mejorar manejo de estado
+
+#### 6. Testing 🧪
+- Fortalezas:
+  * Pruebas básicas existentes
+- Mejoras Necesarias:
+  * Ampliar pruebas unitarias
+  * Agregar pruebas de integración
+  * Implementar pruebas end-to-end
+  * Aumentar cobertura
+
+#### 7. DevOps 🚀
+- Fortalezas:
+  * Script de inicio configurado
+  * Dependencies actualizadas
+- Mejoras Necesarias:
+  * Configurar entornos
+  * Dockerizar aplicación
+  * Implementar CI/CD
+
+#### 8. Documentación 📚
+- Fortalezas:
+  * README básico
+  * Bitácora mantenida
+- Mejoras Necesarias:
+  * Documentar API
+  * Agregar guía de contribución
+  * Incluir docstrings
+
+### Código de Referencia para Mejoras
+
+```python
+# Protección CSRF
+from flask_wtf.csrf import CSRFProtect
+csrf = CSRFProtect()
+csrf.init_app(app)
+
+# Sistema de Logging
+import logging
+from logging.handlers import RotatingFileHandler
+if not app.debug:
+    file_handler = RotatingFileHandler('logs/rutas.log', maxBytes=10240, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+
+# Migraciones
+from flask_migrate import Migrate
+migrate = Migrate(app, db)
+
+# Testing Base
+class TestConfig:
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+```
+
+### Prioridades para Desarrollo de Albaranes
+1. Implementar CSRF y seguridad ⚠️
+2. Configurar logging para trazabilidad 📝
+3. Implementar migraciones para cambios en BD 🔄
+4. Mejorar cobertura de pruebas 🧪
+5. Optimizar manejo de errores ❌
+6. Documentar API y código 📚
+
+### Notas para Próximas Sesiones
+- Revisar estas recomendaciones antes de iniciar desarrollo de albaranes
+- Priorizar aspectos de seguridad y logging
+- Considerar implementar mejoras gradualmente
+- Mantener documentación actualizada

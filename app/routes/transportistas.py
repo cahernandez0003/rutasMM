@@ -5,14 +5,14 @@ from app.models.transportistas import (
 )
 from app.decorators import requiere_login, requiere_rol
 
-transportistas_bp = Blueprint('transportistas', __name__, template_folder='../templates/pages/transportistas')
+transportistas_bp = Blueprint('transportistas', __name__)
 
 @transportistas_bp.route('/')
 @requiere_login
 @requiere_rol('supus', 'admin')
 def index():
     transportistas = get_all_transportistas()
-    return render_template('transportistas/index.html', transportistas=transportistas, title="Transportistas")
+    return render_template('pages/transportistas/index.html', transportistas=transportistas, title="Transportistas")
 
 @transportistas_bp.route('/crear', methods=['GET', 'POST'])
 @requiere_login
@@ -28,7 +28,7 @@ def crear():
             return redirect(url_for('transportistas.index'))
         except Exception as e:
             flash(f'Error: {e}', 'danger')
-    return render_template('transportistas/form.html', action="Crear", t=None)
+    return render_template('pages/transportistas/form.html', action="Crear", t=None)
 
 @transportistas_bp.route('/editar/<int:transportista_id>', methods=['GET', 'POST'])
 @requiere_login
@@ -49,7 +49,7 @@ def editar(transportista_id):
             return redirect(url_for('transportistas.index'))
         except Exception as e:
             flash(f'Error: {e}', 'danger')
-    return render_template('transportistas/form.html', action="Editar", t=t)
+    return render_template('pages/transportistas/form.html', action="Editar", t=t)
 
 @transportistas_bp.route('/eliminar/<int:transportista_id>', methods=['POST'])
 @requiere_login

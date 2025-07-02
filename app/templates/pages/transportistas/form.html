@@ -2,50 +2,52 @@
 <div class="container py-4">
   <h1>{{ action }} Transportista</h1>
   <form method="post">
-    <div class="mb-3">
-      <label for="nombres" class="form-label">Nombres</label>
-      <input type="text" class="form-control" name="nombres" id="nombres"
-             value="{{ t.nombres if t else '' }}" required>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="nombres">Nombres</label>
+        <input type="text" class="form-control" id="nombres" name="nombres" value="{{ t.nombres if t else '' }}" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="apellidos">Apellidos</label>
+        <input type="text" class="form-control" id="apellidos" name="apellidos" value="{{ t.apellidos if t else '' }}" required>
+      </div>
     </div>
-    <div class="mb-3">
-      <label for="apellidos" class="form-label">Apellidos</label>
-      <input type="text" class="form-control" name="apellidos" id="apellidos"
-             value="{{ t.apellidos if t else '' }}" required>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label for="telefono">Teléfono</label>
+        <input type="tel" class="form-control" id="telefono" name="telefono" value="{{ t.telefono if t else '' }}">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" name="email" value="{{ t.email if t else '' }}">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="documento_cif">CIF/NIF</label>
+        <input type="text" class="form-control" id="documento_cif" name="documento_cif" value="{{ t.documento_cif if t else '' }}" required>
+      </div>
     </div>
-    <div class="mb-3">
-      <label for="telefono" class="form-label">Teléfono</label>
-      <input type="text" class="form-control" name="telefono" id="telefono"
-             value="{{ t.telefono if t else '' }}">
+    <div class="row">
+      <div class="col-md-8 mb-3">
+        <label for="direccion">Dirección</label>
+        <input type="text" class="form-control" id="direccion" name="direccion" value="{{ t.direccion if t else '' }}">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="codigo_postal">Código Postal</label>
+        <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" value="{{ t.codigo_postal if t else '' }}">
+      </div>
     </div>
+    {% if t %}
     <div class="mb-3">
-      <label for="direccion" class="form-label">Dirección</label>
-      <input type="text" class="form-control" name="direccion" id="direccion"
-             value="{{ t.direccion if t else '' }}">
-    </div>
-    <div class="mb-3">
-      <label for="email" class="form-label">Email</label>
-      <input type="email" class="form-control" name="email" id="email"
-             value="{{ t.email if t else '' }}">
-    </div>
-    <div class="mb-3">
-      <label for="documento_cif" class="form-label">Documento CIF</label>
-      <input type="text" class="form-control" name="documento_cif" id="documento_cif"
-             value="{{ t.documento_cif if t else '' }}">
-    </div>
-    <div class="mb-3">
-      <label for="codigo_postal" class="form-label">Código Postal</label>
-      <input type="text" class="form-control" name="codigo_postal" id="codigo_postal"
-             value="{{ t.codigo_postal if t else '' }}">
-    </div>
-    {% if action == 'Editar' %}
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" name="activo" id="activo"
-             {% if t and t.activo %}checked{% endif %}>
-      <label class="form-check-label" for="activo">Activo</label>
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="activo" name="activo" {{ 'checked' if t.activo else '' }}>
+        <label class="form-check-label" for="activo">Activo</label>
+      </div>
     </div>
     {% endif %}
-    <button type="submit" class="btn btn-success">{{ action }}</button>
-    <a href="{{ url_for('transportistas.index') }}" class="btn btn-secondary">Volver</a>
+    <div class="mt-4">
+      <button type="submit" class="btn btn-success">Guardar</button>
+      <a href="{{ url_for('transportistas.index') }}" class="btn btn-secondary">Volver</a>
+    </div>
   </form>
 </div>
 {% include 'includes/footer.html' %}
