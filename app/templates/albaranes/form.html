@@ -1,46 +1,163 @@
-{% include 'includes/header.html' %}
-<div class="container">
-    <h3>Nuevo Albarán de Ruta</h3>
-    <form method="post" id="cabecera-form">
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <label>Ruta</label>
-                <select name="ruta_id" id="ruta_id" class="form-select" required>
-                    <option value="">Seleccione una ruta</option>
-                    {% for id, nombre in rutas %}
-                        <option value="{{ id }}">{{ nombre }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label>Transportista</label>
-                <select name="transportista_id" class="form-select" required>
-                    <option value="">Seleccione un transportista</option>
-                    {% for id, nombre in transportistas %}
-                        <option value="{{ id }}">{{ nombre }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label>Fecha</label>
-                <input type="date" name="fecha" class="form-control" value="{{ fecha_hoy }}" required>
-            </div>
-            <div class="col-md-2">
-                <label>N° Albarán</label>
-                <input type="text" name="numero_albaran" class="form-control" value="" readonly>
+{% extends 'includes/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="img-fluid" style="max-height: 100px;">
+                            <div class="company-info">
+                                <p>MIMOUN MARKET SL</p>
+                                <p>CIF: B95829370</p>
+                                <p>Polígono Artunduaga 4, Pab 3</p>
+                                <p>48970 Basauri</p>
+                                <p>Bizkaia</p>
+                                <p>Tel: 681392805</p>
+                                <p>Email: info@mimounmarket.com</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="transportista-info" class="text-end">
+                                <!-- Aquí se cargarán los datos del transportista -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="text-center mb-4">ALBARÁN DE SALIDA MERCANCÍA</h3>
+                    <form method="post" id="cabecera-form">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Ruta</label>
+                                <select name="ruta_id" id="ruta_id" class="form-select" required>
+                                    <option value="">Seleccione una ruta</option>
+                                    {% for ruta in rutas %}
+                                        <option value="{{ ruta.id }}" data-porcentaje="{{ ruta.porcentaje_default }}">
+                                            {{ ruta.nombre }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Transportista</label>
+                                <select name="transportista_id" id="transportista_id" class="form-select" required>
+                                    <option value="">Seleccione un transportista</option>
+                                    {% for t in transportistas %}
+                                        <option value="{{ t.id }}" data-telefono="{{ t.telefono }}">
+                                            {{ t.nombre }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Fecha</label>
+                                <input type="date" name="fecha" class="form-control" value="{{ fecha_hoy }}" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">N° Albarán</label>
+                                <input type="text" name="numero_albaran" id="numero_albaran" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label">% Pactado</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.01" min="0" max="100" 
+                                           name="porcentaje_pactado" id="porcentaje_pactado" 
+                                           class="form-control" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar Cabecera
+                                </button>
+                                <a href="{{ url_for('albaranes.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label>% Pactado</label>
-                <input type="number" step="0.01" name="porcentaje_pactado" class="form-control" value="">
-            </div>
-            <div class="col-md-3">
-                <label>Base Imponible</label>
-                <input type="number" step="0.01" name="base_imponible" class="form-control" required>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-success">Guardar cabecera</button>
-    </form>
+    </div>
 </div>
-{% include 'includes/footer.html' %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rutaSelect = document.getElementById('ruta_id');
+    const transportistaSelect = document.getElementById('transportista_id');
+    const porcentajeInput = document.getElementById('porcentaje_pactado');
+    const transportistaInfo = document.getElementById('transportista-info');
+    const numeroAlbaranInput = document.getElementById('numero_albaran');
+
+    // Obtener número de albarán al cargar
+    async function obtenerNumeroAlbaran() {
+        try {
+            const response = await fetch('/albaranes/api/siguiente_numero');
+            const data = await response.json();
+            if (data.numero) {
+                numeroAlbaranInput.value = data.numero;
+            } else {
+                console.error('No se pudo obtener el número de albarán');
+            }
+        } catch (error) {
+            console.error('Error al obtener número de albarán:', error);
+        }
+    }
+
+    // Cargar número de albarán al iniciar
+    obtenerNumeroAlbaran();
+
+    // Actualizar porcentaje cuando cambia la ruta
+    rutaSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const porcentaje = selectedOption.dataset.porcentaje;
+        if (porcentaje) {
+            porcentajeInput.value = porcentaje;
+        }
+    });
+
+    // Cargar datos del transportista
+    transportistaSelect.addEventListener('change', async function() {
+        const transportistaId = this.value;
+        if (!transportistaId) {
+            transportistaInfo.innerHTML = '';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/albaranes/api/transportista/${transportistaId}`);
+            const data = await response.json();
+            
+            transportistaInfo.innerHTML = `
+                <p>CIF: ${data.documento_cif}</p>
+                <p>${data.direccion}</p>
+                <p>${data.codigo_postal} ${data.municipio}</p>
+                <p>Bizkaia</p>
+                <p>Tel: ${data.telefono}</p>
+                <p>Email: ${data.email}</p>
+            `;
+        } catch (error) {
+            console.error('Error al cargar datos del transportista:', error);
+            transportistaInfo.innerHTML = '<p class="text-danger">Error al cargar datos del transportista</p>';
+        }
+    });
+
+    // Validar porcentaje
+    porcentajeInput.addEventListener('input', function() {
+        const valor = parseFloat(this.value);
+        if (valor < 0) this.value = 0;
+        if (valor > 100) this.value = 100;
+    });
+});
+</script>
+{% endblock %}
