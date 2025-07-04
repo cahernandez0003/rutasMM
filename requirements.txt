@@ -23,3 +23,6 @@ Flask-Assets==2.1.0
 webassets==2.0
 cssmin==0.2.0
 jsmin==3.0.1
+Flask-Session==0.5.0
+pytest==8.0.2
+coverage==7.4.3

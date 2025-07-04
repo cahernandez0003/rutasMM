@@ -2,88 +2,153 @@
 
 {% block content %}
 <div class="container-fluid">
-    <div class="row mb-3">
+    <div class="row mb-2">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header p-2">
                     <div class="row">
-                        <div class="col-md-6">
-                            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="img-fluid" style="max-height: 100px;">
-                            <div class="company-info">
-                                <p>MIMOUN MARKET SL</p>
-                                <p>CIF: B95829370</p>
-                                <p>Polígono Artunduaga 4, Pab 3</p>
-                                <p>48970 Basauri</p>
-                                <p>Bizkaia</p>
-                                <p>Tel: 681392805</p>
-                                <p>Email: info@mimounmarket.com</p>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='images/logo_MM.png') }}" alt="Logo" class="img-fluid me-2" style="max-height: 60px; object-fit: contain;">
+                                <div class="company-info small">
+                                    <p class="mb-0"><strong>MIMOUN MARKET SL</strong></p>
+                                    <p class="mb-0">CIF: B95829370</p>
+                                    <p class="mb-0">Polígono Artunduaga 4, Pab 3</p>
+                                    <p class="mb-0">48970 Basauri (Bizkaia)</p>
+                                    <p class="mb-0">Tel: 681392805</p>
+                                    <p class="mb-0">Email: info@mimounmarket.com</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div id="transportista-info" class="text-end">
+                        <div class="col-6">
+                            <div id="transportista-info" class="text-end small">
                                 <!-- Aquí se cargarán los datos del transportista -->
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <h3 class="text-center mb-4">ALBARÁN DE SALIDA MERCANCÍA</h3>
-                    <form method="post" id="cabecera-form">
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <label class="form-label">Ruta</label>
-                                <select name="ruta_id" id="ruta_id" class="form-select" required>
-                                    <option value="">Seleccione una ruta</option>
+                <div class="card-body p-2">
+                    <h5 class="text-center mb-2">ALBARÁN DE SALIDA MERCANCÍA</h5>
+    <form method="post" id="cabecera-form">
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-2">
+                                <label class="form-label small mb-0">Ruta</label>
+                                <select name="ruta_id" id="ruta_id" class="form-select form-select-sm" required>
+                    <option value="">Seleccione una ruta</option>
                                     {% for ruta in rutas %}
                                         <option value="{{ ruta.id }}" data-porcentaje="{{ ruta.porcentaje_default }}">
                                             {{ ruta.nombre }}
                                         </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                    {% endfor %}
+                </select>
+            </div>
                             <div class="col-md-3">
-                                <label class="form-label">Transportista</label>
-                                <select name="transportista_id" id="transportista_id" class="form-select" required>
-                                    <option value="">Seleccione un transportista</option>
+                                <label class="form-label small mb-0">Transportista</label>
+                                <select name="transportista_id" id="transportista_id" class="form-select form-select-sm" required>
+                    <option value="">Seleccione un transportista</option>
                                     {% for t in transportistas %}
                                         <option value="{{ t.id }}" data-telefono="{{ t.telefono }}">
                                             {{ t.nombre }}
                                         </option>
-                                    {% endfor %}
-                                </select>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                                <label class="form-label small mb-0">Fecha</label>
+                                <input type="date" name="fecha" class="form-control form-control-sm" value="{{ fecha_hoy }}" required>
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Fecha</label>
-                                <input type="date" name="fecha" class="form-control" value="{{ fecha_hoy }}" required>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">N° Albarán</label>
-                                <input type="text" name="numero_albaran" id="numero_albaran" class="form-control" readonly>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <label class="form-label">% Pactado</label>
-                                <div class="input-group">
+                            <div class="col-md-2">
+                                <label class="form-label small mb-0">N° Albarán</label>
+                                <input type="text" name="numero_albaran" id="numero_albaran" 
+                                       class="form-control form-control-sm" readonly 
+                                       value="{{ siguiente_numero }}">
+            </div>
+            <div class="col-md-2">
+                                <label class="form-label small mb-0">% Pactado</label>
+                                <div class="input-group input-group-sm">
                                     <input type="number" step="0.01" min="0" max="100" 
                                            name="porcentaje_pactado" id="porcentaje_pactado" 
-                                           class="form-control" required>
+                                           class="form-control form-control-sm" required>
                                     <span class="input-group-text">%</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Guardar Cabecera
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary btn-sm" id="btn-guardar">
+                                    <i class="fas fa-check"></i>
                                 </button>
-                                <a href="{{ url_for('albaranes.index') }}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Cancelar
-                                </a>
                             </div>
                         </div>
                     </form>
-                </div>
+
+                    <!-- Tabla de líneas (inicialmente oculta) -->
+                    <div id="lineas-albaran" class="mt-2" style="display: none;">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>NÚMERO_ALBARÁN</th>
+                                    <th>NOMBRE_CLIENTE</th>
+                                    <th>COD_CLIENTE</th>
+                                    <th>MUNICIPIO_ENVÍO</th>
+                                    <th>IMPORTE €</th>
+                                    <th>D/P</th>
+                                    <th>FIRMA/RECIBE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Aquí se cargarán las líneas dinámicamente -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-end"><strong>VALORACIÓN DE MERCANCÍA ENTREGADA</strong></td>
+                                    <td class="text-end"><strong id="total-mercancia">0.00 €</strong></td>
+                                    <td colspan="2"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end"><strong>COMISIÓN PACTADA %</strong></td>
+                                    <td class="text-end"><strong id="total-comision">0.00 €</strong></td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Sección de firmas -->
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <p class="small mb-1">ENTREGA MIMOUN MARKET SL</p>
+                            <div class="border-bottom" style="height: 60px;"></div>
+                        </div>
+                        <div class="col-6">
+                            <p class="small mb-1">RECIBE</p>
+                            <div class="border-bottom" style="height: 60px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sección de revisión -->
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <p class="small mb-1">REVISÓ MERCANCÍA</p>
+                            <div class="border-bottom" style="height: 30px;"></div>
+                        </div>
+                        <div class="col-6">
+                            <p class="small mb-1">CONDUCTOR</p>
+                            <div id="conductor-nombre" class="small"></div>
+                        </div>
+                    </div>
+
+                    <!-- Cláusula de aceptación -->
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <p class="small mb-0" style="font-size: 0.7rem;">
+                                <strong>Cláusula de Aceptación y Responsabilidad:</strong> Al firmar el presente albarán de salida, la persona receptora confirma que los importes detallados en este documento
+                                han sido revisados y aceptados, y que la mercancía recibida se encuentra en perfecto estado. A partir de este momento, la responsabilidad sobre el estado de la
+                                mercancía, incluyendo cualquier daño, pérdida de frío o deterioro en la calidad de los productos, recae sobre la empresa logística encargada del transporte. La
+                                empresa proveedora logística asumirá la totalidad de los costos y responsabilidades derivados de cualquier incidencia que afecte a la mercancía desde la firma de
+                                este documento.
+                            </p>
+            </div>
+        </div>
+            </div>
             </div>
         </div>
     </div>
@@ -98,19 +163,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const porcentajeInput = document.getElementById('porcentaje_pactado');
     const transportistaInfo = document.getElementById('transportista-info');
     const numeroAlbaranInput = document.getElementById('numero_albaran');
+    const conductorNombre = document.getElementById('conductor-nombre');
+    const form = document.getElementById('cabecera-form');
 
     // Obtener número de albarán al cargar
     async function obtenerNumeroAlbaran() {
         try {
             const response = await fetch('/albaranes/api/siguiente_numero');
+            if (!response.ok) {
+                throw new Error('Error al obtener número de albarán');
+            }
             const data = await response.json();
             if (data.numero) {
                 numeroAlbaranInput.value = data.numero;
             } else {
-                console.error('No se pudo obtener el número de albarán');
+                throw new Error('No se pudo obtener el número de albarán');
             }
         } catch (error) {
-            console.error('Error al obtener número de albarán:', error);
+            console.error('Error:', error);
+            alert('Error al obtener número de albarán: ' + error.message);
         }
     }
 
@@ -124,31 +195,46 @@ document.addEventListener('DOMContentLoaded', function() {
         if (porcentaje) {
             porcentajeInput.value = porcentaje;
         }
+        actualizarConductor();
     });
+
+    // Función para actualizar el conductor
+    function actualizarConductor() {
+        if (transportistaSelect.value && rutaSelect.value) {
+            const nombreTransportista = transportistaSelect.options[transportistaSelect.selectedIndex].text;
+            const rutaSeleccionada = rutaSelect.options[rutaSelect.selectedIndex].text;
+            conductorNombre.innerHTML = `<strong>${nombreTransportista}</strong><br>RUTA ${rutaSeleccionada}`;
+        }
+    }
 
     // Cargar datos del transportista
     transportistaSelect.addEventListener('change', async function() {
         const transportistaId = this.value;
         if (!transportistaId) {
             transportistaInfo.innerHTML = '';
+            conductorNombre.innerHTML = '';
             return;
         }
 
         try {
             const response = await fetch(`/albaranes/api/transportista/${transportistaId}`);
+            if (!response.ok) throw new Error('Error al cargar datos del transportista');
             const data = await response.json();
             
             transportistaInfo.innerHTML = `
-                <p>CIF: ${data.documento_cif}</p>
-                <p>${data.direccion}</p>
-                <p>${data.codigo_postal} ${data.municipio}</p>
-                <p>Bizkaia</p>
-                <p>Tel: ${data.telefono}</p>
-                <p>Email: ${data.email}</p>
+                <p class="mb-0">CIF: ${data.documento_cif}</p>
+                <p class="mb-0">${data.direccion}</p>
+                <p class="mb-0">${data.codigo_postal}</p>
+                <p class="mb-0">${data.provincia}</p>
+                <p class="mb-0">Tel: ${data.telefono}</p>
+                <p class="mb-0">Email: ${data.email}</p>
             `;
+
+            actualizarConductor();
         } catch (error) {
-            console.error('Error al cargar datos del transportista:', error);
-            transportistaInfo.innerHTML = '<p class="text-danger">Error al cargar datos del transportista</p>';
+            console.error('Error:', error);
+            transportistaInfo.innerHTML = '<p class="text-danger mb-0">Error al cargar datos del transportista</p>';
+            conductorNombre.innerHTML = '';
         }
     });
 
@@ -157,6 +243,55 @@ document.addEventListener('DOMContentLoaded', function() {
         const valor = parseFloat(this.value);
         if (valor < 0) this.value = 0;
         if (valor > 100) this.value = 100;
+    });
+
+    // Manejar el envío del formulario
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btnGuardar = document.getElementById('btn-guardar');
+        btnGuardar.disabled = true;
+
+        try {
+            const formData = new FormData(this);
+            const response = await fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al guardar el albarán');
+            }
+
+            const result = await response.json();
+            
+            if (result.success) {
+                btnGuardar.innerHTML = '<i class="fas fa-check text-success"></i>';
+                document.getElementById('lineas-albaran').style.display = 'block';
+                
+                // Actualizar el número de albarán
+                if (result.numero_albaran) {
+                    numeroAlbaranInput.value = result.numero_albaran;
+                }
+
+                // Deshabilitar todos los campos del formulario
+                this.querySelectorAll('input, select').forEach(element => {
+                    element.disabled = true;
+                });
+
+                actualizarConductor();
+            } else {
+                throw new Error(result.message || 'Error al guardar el albarán');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message);
+            btnGuardar.disabled = false;
+            btnGuardar.innerHTML = '<i class="fas fa-check"></i>';
+        }
     });
 });
 </script>

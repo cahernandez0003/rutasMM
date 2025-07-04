@@ -198,3 +198,24 @@ class TestConfig:
 - Priorizar aspectos de seguridad y logging
 - Considerar implementar mejoras gradualmente
 - Mantener documentación actualizada
+
+[04/07/2025] - Mejoras en Albaranes y Correcciones
+- Corrección de problemas de concurrencia en la generación de números de albarán:
+  * Implementación de bloqueo a nivel de sesión usando pg_advisory_xact_lock
+  * Simplificación de la lógica para obtener el siguiente número usando MAX y SPLIT_PART
+  * Mejora en el manejo de transacciones para evitar duplicados
+
+- Configuración de archivos estáticos:
+  * Modificación de la configuración de Flask para manejar correctamente la carpeta static
+  * Especificación explícita de rutas static_folder y static_url_path
+  * Corrección en la carga y visualización del logo corporativo
+
+- Mejoras en la interfaz de usuario:
+  * Optimización del formulario de albaranes
+  * Corrección en la visualización del logo
+  * Mejora en la gestión de sesiones múltiples
+
+- Problemas Pendientes:
+  * Verificar la correcta visualización del logo después de los cambios
+  * Monitorear el comportamiento de la generación de números de albarán en producción
+  * Realizar pruebas adicionales de concurrencia

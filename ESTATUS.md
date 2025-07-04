@@ -1,53 +1,88 @@
-# Estado Actual del Proyecto
+# Estado del Proyecto - Sistema de Gestión de Rutas
 
-## Módulo de Albaranes
+## Estado Actual
+El proyecto se encuentra en fase de desarrollo activo, con énfasis en la implementación y mejora del módulo de albaranes.
 
-### Implementado
-1. **Estructura Base**
-   - Blueprint de albaranes configurado
-   - Rutas básicas establecidas (/albaranes/)
-   - Plantillas base y formularios creados
+### Módulos Implementados
 
-2. **Cabecera de Albarán**
-   - Modelo de datos implementado
-   - Generación automática de números de albarán (YYYY/NNN)
-   - Control de concurrencia para números
-   - Validaciones de datos implementadas
+#### 1. Módulo de Albaranes
+- **Estado**: En desarrollo
+- **Funcionalidades Implementadas**:
+  * Generación automática de números de albarán (formato YYYY/NNN)
+  * Formulario de entrada de datos optimizado
+  * Manejo de concurrencia para números de albarán
+  * Integración con datos de transportistas
+  * Cálculo automático de porcentajes
+  * Visualización de datos de empresa y transportista
 
-3. **Interfaz de Usuario**
-   - Formulario de cabecera con campos requeridos
-   - Carga dinámica de datos de transportista
-   - Porcentajes automáticos según ruta
-   - Validación de campos en frontend
+#### 2. Módulo de Transportistas
+- **Estado**: Completado
+- **Funcionalidades**:
+  * CRUD completo de transportistas
+  * Validación de datos
+  * Integración con rutas
 
-4. **Datos Fijos**
-   - Información de MIMOUN MARKET SL
-   - Datos de contacto y dirección
-   - CIF y datos fiscales
+#### 3. Módulo de Rutas
+- **Estado**: Completado
+- **Funcionalidades**:
+  * Gestión de rutas de distribución
+  * Asignación de porcentajes por defecto
+  * Vinculación con transportistas
 
-5. **Integraciones**
-   - API para datos de transportista
-   - Conexión con módulo de rutas
-   - Sistema de autenticación y roles
+#### 4. Sistema de Autenticación
+- **Estado**: Completado
+- **Funcionalidades**:
+  * Login/Logout
+  * Manejo de sesiones
+  * Control de acceso basado en roles
 
-### En Desarrollo
-1. **Líneas de Albarán**
-   - Pendiente implementación completa
-   - Estructura de base de datos definida
+### Problemas Conocidos
+1. Visualización del logo corporativo en albaranes
+2. Concurrencia en generación de números de albarán
+3. Optimización pendiente para múltiples sesiones
 
-2. **Cálculos Automáticos**
-   - Base imponible
-   - Importe líquido
-   - Beneficios y porcentajes
+### Próximos Pasos
+1. Resolver problemas de visualización de assets estáticos
+2. Implementar pruebas de concurrencia exhaustivas
+3. Optimizar el manejo de sesiones múltiples
+4. Mejorar la documentación del código
 
-### Últimos Cambios
-1. Corrección de rutas y prefijos de URL
-2. Implementación de plantilla base
-3. Mejora en validaciones de datos
-4. Corrección de generación de números de albarán
+### Tecnologías Principales
+- Backend: Flask 3.1.1
+- Base de Datos: PostgreSQL
+- Frontend: Bootstrap, JavaScript
+- Autenticación: Flask-Login
+- ORM: SQLAlchemy
 
-## Estado General
-- **Backend**: 70% completado
-- **Frontend**: 60% completado
-- **Base de Datos**: 80% completado
-- **Documentación**: 40% completado 
+### Estructura del Proyecto
+```
+rutas/
+  ├── app/
+  │   ├── models/         # Modelos de datos
+  │   ├── routes/         # Rutas de la aplicación
+  │   ├── templates/      # Plantillas HTML
+  │   └── static/         # Archivos estáticos
+  ├── migrations/         # Migraciones de base de datos
+  ├── tests/             # Pruebas unitarias
+  └── config/            # Configuración
+```
+
+### Entorno de Desarrollo
+- Python 3.12
+- PostgreSQL 16
+- Sistema Operativo: Windows
+- IDE: Visual Studio Code
+
+### Notas Importantes
+- El sistema está diseñado para manejar múltiples sesiones concurrentes
+- Se requiere PostgreSQL con soporte para bloqueos consultivos
+- La configuración de desarrollo usa variables de entorno en `.env`
+
+## Historial de Versiones
+- v0.1.0: Implementación inicial de módulos básicos
+- v0.2.0: Adición del módulo de albaranes
+- v0.2.1: Mejoras en concurrencia y UI
+
+## Contacto
+- Desarrollador Principal: [Contacto]
+- Repositorio: [URL del repositorio] 

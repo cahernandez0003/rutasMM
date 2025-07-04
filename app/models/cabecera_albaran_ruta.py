@@ -3,59 +3,48 @@ from decimal import Decimal, InvalidOperation
 from app.models.bd_postgresql import get_postgresql_connection
 from app.models.rutas import get_ruta_by_id
 
-def obtener_siguiente_numero_albaran():
+def obtener_siguiente_numero_albaran(conn=None, cur=None):
     """
-    Obtiene el siguiente número de albarán usando un bloqueo de tabla para evitar duplicados
+    Obtiene el siguiente número de albarán usando un bloqueo de sesión para evitar duplicados
     en situaciones concurrentes.
     """
-    año_actual = datetime.date.today().year
-    conn = get_postgresql_connection()
-    cur = conn.cursor()
+    close_connection = False
+    if not conn or not cur:
+        conn = get_postgresql_connection()
+        cur = conn.cursor()
+        close_connection = True
+
     try:
-        # Iniciar transacción y bloquear la tabla
-        cur.execute("BEGIN")
-        cur.execute("LOCK TABLE cabecera_albaran_ruta IN SHARE MODE")
+        # Adquirir un bloqueo exclusivo a nivel de sesión
+        cur.execute("SELECT pg_advisory_xact_lock(1)")  # 1 es un ID arbitrario para este bloqueo
+        
+        año_actual = datetime.date.today().year
         
         # Obtener el último número del año actual
         cur.execute("""
-            SELECT numero_albaran
+            SELECT MAX(CAST(SPLIT_PART(numero_albaran, '/', 2) AS INTEGER))
             FROM cabecera_albaran_ruta
             WHERE numero_albaran LIKE %s
-            ORDER BY numero_albaran DESC
-            LIMIT 1
-            FOR UPDATE
         """, (f"{año_actual}/%",))
         
         row = cur.fetchone()
+        siguiente = (row[0] or 0) + 1
         
-        if row and row[0]:
-            ultimo_numero = int(row[0].split('/')[-1])
-            siguiente = ultimo_numero + 1
-        else:
-            siguiente = 1
-        
+        # Formatear el nuevo número
         nuevo_numero = f"{año_actual}/{siguiente:03d}"
         
-        # Verificar que el número no exista (doble verificación)
-        cur.execute("""
-            SELECT COUNT(*) 
-            FROM cabecera_albaran_ruta 
-            WHERE numero_albaran = %s
-        """, (nuevo_numero,))
-        
-        if cur.fetchone()[0] > 0:
-            # Si existe, intentar el siguiente número
-            siguiente += 1
-            nuevo_numero = f"{año_actual}/{siguiente:03d}"
-        
-        conn.commit()
+        if close_connection:
+            conn.commit()
+            
         return nuevo_numero
     except Exception as e:
-        conn.rollback()
-        raise e
+        if close_connection:
+            conn.rollback()
+        raise Exception(f"Error al obtener número de albarán: {str(e)}")
     finally:
-        cur.close()
-        conn.close()
+        if close_connection:
+            cur.close()
+            conn.close()
 
 def calcular_porcentaje_pactado(ruta_id):
     """Calcula el porcentaje pactado según la ruta"""
@@ -116,6 +105,9 @@ def crear_cabecera_albaran_ruta(data):
     conn = get_postgresql_connection()
     cur = conn.cursor()
     try:
+        # Iniciar transacción
+        cur.execute("BEGIN")
+
         # Validar datos requeridos
         required_fields = ['fecha', 'transportista_id', 'ruta_id', 'usuario_id']
         for field in required_fields:
@@ -128,9 +120,9 @@ def crear_cabecera_albaran_ruta(data):
         data['ruta_id'] = int(data['ruta_id'])
         data['usuario_id'] = int(data['usuario_id'])
 
-        # Generar número de albarán
+        # Generar número de albarán dentro de la misma transacción
         if 'numero_albaran' not in data:
-            data['numero_albaran'] = obtener_siguiente_numero_albaran()
+            data['numero_albaran'] = obtener_siguiente_numero_albaran(conn, cur)
 
         # Calcular y validar porcentaje pactado
         if 'porcentaje_pactado' not in data:

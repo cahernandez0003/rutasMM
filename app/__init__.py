@@ -1,8 +1,11 @@
 from flask import Flask, render_template
 from datetime import datetime
+import os
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, 
+                static_folder='../static',  # Ruta relativa a la carpeta static desde app/
+                static_url_path='/static')  # URL path para acceder a static
     app.config.from_object('app.config.Config')
 
     from app.routes.rutas import rutas_bp
