@@ -85,31 +85,120 @@
                         <table class="table table-sm table-bordered">
                             <thead class="table-light">
                                 <tr>
-                                    <th>NÚMERO_ALBARÁN</th>
-                                    <th>NOMBRE_CLIENTE</th>
-                                    <th>COD_CLIENTE</th>
-                                    <th>MUNICIPIO_ENVÍO</th>
-                                    <th>IMPORTE €</th>
-                                    <th>D/P</th>
-                                    <th>FIRMA/RECIBE</th>
+                                    <th>BENEFICIO</th>
+                                    <th>IMP. LIQU</th>
+                                    <th>%</th>
+                                    <th>AYAD MOHAMED</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="lineas-body">
                                 <!-- Aquí se cargarán las líneas dinámicamente -->
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="4" class="text-end"><strong>VALORACIÓN DE MERCANCÍA ENTREGADA</strong></td>
-                                    <td class="text-end"><strong id="total-mercancia">0.00 €</strong></td>
-                                    <td colspan="2"></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="4" class="text-end"><strong>COMISIÓN PACTADA %</strong></td>
-                                    <td class="text-end"><strong id="total-comision">0.00 €</strong></td>
-                                    <td colspan="2"></td>
+                                    <td class="text-end"><strong id="total-beneficio">0.00 €</strong></td>
+                                    <td class="text-end"><strong id="total-imp-liqu">0.00 €</strong></td>
+                                    <td class="text-end"><strong id="porcentaje-promedio">0.00%</strong></td>
+                                    <td></td>
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+
+                    <!-- Sección de Líneas de Albarán -->
+                    <div id="lineas-form" class="mt-4">
+                        <h4>Líneas de Albarán</h4>
+                        
+                        <!-- Tabla de líneas -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Serie</th>
+                                        <th>Número</th>
+                                        <th>Cliente</th>
+                                        <th>Código</th>
+                                        <th>Municipio</th>
+                                        <th>Importe</th>
+                                        <th>Beneficio</th>
+                                        <th>Imp. Líquido</th>
+                                        <th>%</th>
+                                        <th>Conductor</th>
+                                        <th>TLPA</th>
+                                        <th>Ben. Post</th>
+                                        <th>% Ben. Real</th>
+                                        <th>Deuda</th>
+                                        <th>Líneas</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lineas-body">
+                                    <!-- Template para nueva línea -->
+                                    <template id="linea-template">
+                                        <tr class="linea-albaran">
+                                            <td><span class="fecha-alb"></span></td>
+                                            <td><input type="text" class="form-control form-control-sm serie-alb" maxlength="10"></td>
+                                            <td><input type="text" class="form-control form-control-sm numero-alb" maxlength="20"></td>
+                                            <td><span class="nombre-cliente"></span></td>
+                                            <td><span class="cod-cliente"></span></td>
+                                            <td><span class="municipio-envio"></span></td>
+                                            <td>
+                                                <input type="number" class="form-control form-control-sm importe" step="0.01" readonly>
+                                                <button class="btn btn-sm btn-outline-warning edit-importe" title="Editar importe">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                            <td><span class="beneficio"></span></td>
+                                            <td><span class="imp-liqu"></span></td>
+                                            <td><span class="porcentaje"></span></td>
+                                            <td><span class="conductor"></span></td>
+                                            <td><span class="tlpa"></span></td>
+                                            <td><span class="ben-post-log"></span></td>
+                                            <td><span class="por-ben-real"></span></td>
+                                            <td><span class="deuda"></span></td>
+                                            <td><span class="lineas"></span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-success btn-ok" disabled title="Finalizar línea">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-primary btn-mas" disabled title="Finalizar y agregar nueva línea">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Modal de confirmación para editar importe -->
+                    <div class="modal fade" id="editImporteModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirmar modificación</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Está seguro de modificar el importe? Esta acción recalculará los siguientes campos:</p>
+                                    <ul>
+                                        <li>TLPA (Tarifa Logística Pactada)</li>
+                                        <li>Beneficio Post-Logístico</li>
+                                        <li>Porcentaje Beneficio Real</li>
+                                    </ul>
+                                    <div class="form-group">
+                                        <label for="nuevoImporte">Nuevo importe:</label>
+                                        <input type="number" class="form-control" id="nuevoImporte" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" id="confirmarImporte">Confirmar</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Sección de firmas -->
@@ -245,54 +334,249 @@ document.addEventListener('DOMContentLoaded', function() {
         if (valor > 100) this.value = 100;
     });
 
-    // Manejar el envío del formulario
+    // Función para cargar las líneas de la ruta
+    async function cargarLineasRuta(rutaId, albaranId, porcentajePactado) {
+        try {
+            const response = await fetch(`/albaranes/api/lineas_ruta/${rutaId}`);
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Error al cargar líneas de la ruta');
+            }
+            
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.message);
+            }
+            
+            const lineas = result.data;
+            const tbody = document.getElementById('lineas-body');
+            tbody.innerHTML = '';
+            
+            let totalBeneficio = 0;
+            let totalImpLiqu = 0;
+            
+            lineas.forEach(linea => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-end">${parseFloat(linea.beneficio).toFixed(2)} €</td>
+                    <td class="text-end">${parseFloat(linea.imp_liqu).toFixed(2)} €</td>
+                    <td class="text-end">${parseFloat(linea.porcentaje).toFixed(2)}%</td>
+                    <td>${linea.conductor}</td>
+                `;
+                tbody.appendChild(tr);
+                
+                totalBeneficio += parseFloat(linea.beneficio);
+                totalImpLiqu += parseFloat(linea.imp_liqu);
+            });
+            
+            // Actualizar totales
+            document.getElementById('total-beneficio').textContent = totalBeneficio.toFixed(2) + ' €';
+            document.getElementById('total-imp-liqu').textContent = totalImpLiqu.toFixed(2) + ' €';
+            document.getElementById('porcentaje-promedio').textContent = porcentajePactado + '%';
+            
+            // Mostrar la tabla de líneas
+            document.getElementById('lineas-albaran').style.display = 'block';
+            
+            // Deshabilitar el formulario de cabecera
+            document.querySelectorAll('#cabecera-form select, #cabecera-form input').forEach(el => {
+                el.disabled = true;
+            });
+            document.getElementById('btn-guardar').style.display = 'none';
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message || 'Error al cargar las líneas de la ruta');
+        }
+    }
+
+    // Modificar el manejador del formulario
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        const btnGuardar = document.getElementById('btn-guardar');
-        btnGuardar.disabled = true;
-
+        
         try {
             const formData = new FormData(this);
-            const response = await fetch(this.action, {
+            const response = await fetch('/albaranes/nuevo', {
                 method: 'POST',
+                body: formData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: formData
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al guardar el albarán');
-            }
-
-            const result = await response.json();
-            
-            if (result.success) {
-                btnGuardar.innerHTML = '<i class="fas fa-check text-success"></i>';
-                document.getElementById('lineas-albaran').style.display = 'block';
-                
-                // Actualizar el número de albarán
-                if (result.numero_albaran) {
-                    numeroAlbaranInput.value = result.numero_albaran;
                 }
-
-                // Deshabilitar todos los campos del formulario
-                this.querySelectorAll('input, select').forEach(element => {
-                    element.disabled = true;
-                });
-
-                actualizarConductor();
+            });
+            
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            
+            const result = await response.json();
+            if (result.success) {
+                // Mostrar mensaje de éxito
+                alert(result.message);
+                
+                // Cargar las líneas de la ruta
+                cargarLineasRuta(result.ruta_id, result.albaran_id, result.porcentaje_pactado);
             } else {
-                throw new Error(result.message || 'Error al guardar el albarán');
+                throw new Error(result.message);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert(error.message);
-            btnGuardar.disabled = false;
-            btnGuardar.innerHTML = '<i class="fas fa-check"></i>';
+            alert('Error al guardar el albarán: ' + error.message);
         }
     });
+});
+
+// Cache para los resultados de la consulta SQL
+let albaranesCache = new Map();
+
+// Función para agregar nueva línea
+function agregarNuevaLinea() {
+    const template = document.getElementById('linea-template');
+    const nuevaLinea = template.content.cloneNode(true);
+    document.getElementById('lineas-body').appendChild(nuevaLinea);
+    
+    // Configurar eventos para la nueva línea
+    const ultimaLinea = document.querySelector('#lineas-body tr:last-child');
+    configurarEventosLinea(ultimaLinea);
+}
+
+// Función para configurar eventos de una línea
+function configurarEventosLinea(lineaElement) {
+    const serieInput = lineaElement.querySelector('.serie-alb');
+    const numeroInput = lineaElement.querySelector('.numero-alb');
+    const importeInput = lineaElement.querySelector('.importe');
+    const editImporteBtn = lineaElement.querySelector('.edit-importe');
+    const btnOk = lineaElement.querySelector('.btn-ok');
+    const btnMas = lineaElement.querySelector('.btn-mas');
+
+    // Evento para buscar albarán al presionar Enter en numero-alb
+    numeroInput.addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter') {
+            const serie = serieInput.value.trim();
+            const numero = numeroInput.value.trim();
+            
+            if (serie && numero) {
+                await buscarYRellenarDatos(serie, numero, lineaElement);
+            }
+        }
+    });
+
+    // Evento para el botón de editar importe
+    editImporteBtn.addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('editImporteModal'));
+        const importeActual = importeInput.value;
+        document.getElementById('nuevoImporte').value = importeActual;
+        
+        // Configurar evento del botón confirmar
+        document.getElementById('confirmarImporte').onclick = () => {
+            const nuevoImporte = document.getElementById('nuevoImporte').value;
+            importeInput.value = nuevoImporte;
+            recalcularCampos(lineaElement);
+            modal.hide();
+        };
+        
+        modal.show();
+    });
+
+    // Eventos para los botones OK y Más
+    btnOk.addEventListener('click', () => finalizarLinea(lineaElement, false));
+    btnMas.addEventListener('click', () => finalizarLinea(lineaElement, true));
+}
+
+// Función para buscar y rellenar datos
+async function buscarYRellenarDatos(serie, numero, lineaElement) {
+    try {
+        const cacheKey = `${serie}-${numero}`;
+        let datos;
+
+        if (albaranesCache.has(cacheKey)) {
+            datos = albaranesCache.get(cacheKey);
+        } else {
+            const response = await fetch(`/albaranes/api/buscar_albaran/${serie}/${numero}`);
+            if (!response.ok) throw new Error('No se encontró el albarán');
+            datos = await response.json();
+            albaranesCache.set(cacheKey, datos);
+        }
+
+        rellenarDatosLinea(lineaElement, datos);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// Función para rellenar datos en la línea
+function rellenarDatosLinea(lineaElement, datos) {
+    // Rellenar campos con los datos
+    lineaElement.querySelector('.fecha-alb').textContent = datos.fecha_alb;
+    lineaElement.querySelector('.nombre-cliente').textContent = datos.nombre_cliente;
+    lineaElement.querySelector('.cod-cliente').textContent = datos.cod_cliente;
+    lineaElement.querySelector('.municipio-envio').textContent = datos.municipio_envio;
+    lineaElement.querySelector('.importe').value = datos.importe;
+    lineaElement.querySelector('.beneficio').textContent = datos.beneficio;
+    lineaElement.querySelector('.imp-liqu').textContent = datos.imp_liqu;
+    lineaElement.querySelector('.porcentaje').textContent = datos.porcentaje;
+    lineaElement.querySelector('.conductor').textContent = datos.conductor;
+    lineaElement.querySelector('.deuda').textContent = datos.deuda;
+    lineaElement.querySelector('.lineas').textContent = datos.lineas;
+
+    // Calcular campos derivados
+    recalcularCampos(lineaElement);
+
+    // Habilitar botones
+    lineaElement.querySelector('.btn-ok').disabled = false;
+    lineaElement.querySelector('.btn-mas').disabled = false;
+}
+
+// Función para recalcular campos
+function recalcularCampos(lineaElement) {
+    const importe = parseFloat(lineaElement.querySelector('.importe').value) || 0;
+    const porcentajePactado = parseFloat(document.getElementById('porcentaje-pactado').value) || 0;
+    
+    // Calcular TLPA
+    const tlpa = importe * (porcentajePactado / 100);
+    lineaElement.querySelector('.tlpa').textContent = tlpa.toFixed(2);
+    
+    // Calcular Beneficio Post-Logístico
+    const beneficio = parseFloat(lineaElement.querySelector('.beneficio').textContent) || 0;
+    const benPostLog = beneficio - tlpa;
+    lineaElement.querySelector('.ben-post-log').textContent = benPostLog.toFixed(2);
+    
+    // Calcular Porcentaje Beneficio Real
+    const porBenReal = importe !== 0 ? (benPostLog / importe) * 100 : 0;
+    lineaElement.querySelector('.por-ben-real').textContent = porBenReal.toFixed(2);
+}
+
+// Función para finalizar línea
+function finalizarLinea(lineaElement, agregarNueva) {
+    // Deshabilitar inputs
+    lineaElement.querySelectorAll('input').forEach(input => input.readOnly = true);
+    lineaElement.querySelectorAll('button').forEach(btn => btn.disabled = true);
+    
+    // Actualizar totales de la cabecera
+    actualizarTotalesCabecera();
+    
+    if (agregarNueva) {
+        agregarNuevaLinea();
+    }
+}
+
+// Función para actualizar totales de la cabecera
+function actualizarTotalesCabecera() {
+    let totalBeneficio = 0;
+    let totalImpLiqu = 0;
+    let totalTLPA = 0;
+    
+    document.querySelectorAll('.linea-albaran').forEach(linea => {
+        totalBeneficio += parseFloat(linea.querySelector('.beneficio').textContent) || 0;
+        totalImpLiqu += parseFloat(linea.querySelector('.imp-liqu').textContent) || 0;
+        totalTLPA += parseFloat(linea.querySelector('.tlpa').textContent) || 0;
+    });
+    
+    // Actualizar totales en la cabecera
+    document.getElementById('total-beneficio').textContent = totalBeneficio.toFixed(2);
+    document.getElementById('total-imp-liqu').textContent = totalImpLiqu.toFixed(2);
+    document.getElementById('total-tlpa').textContent = totalTLPA.toFixed(2);
+}
+
+// Inicializar primera línea al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    agregarNuevaLinea();
 });
 </script>
 {% endblock %}

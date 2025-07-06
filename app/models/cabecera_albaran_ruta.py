@@ -144,19 +144,19 @@ def crear_cabecera_albaran_ruta(data):
 
         cur.execute("""
             INSERT INTO cabecera_albaran_ruta
-            (fecha, transportista_id, ruta_id, base_imponible, importe_liquido, 
-             importe_transporte, beneficio, beneficio_post_log, porcentaje_ben_real,
-             lineas_pedido, porcentaje_pactado, usuario_id, fecha_registro,
-             numero_albaran, cantidad_pedidos)
+                (fecha, transportista_id, ruta_id, base_imponible, importe_liquido, 
+                importe_transporte, beneficio, beneficio_post_log, porcentaje_ben_real,
+                lineas_pedido, porcentaje_pactado, usuario_id, fecha_registro,
+                numero_albaran, cantidad_pedidos)
             VALUES
-            (%(fecha)s, %(transportista_id)s, %(ruta_id)s, %(base_imponible)s,
-             %(importe_liquido)s, %(importe_transporte)s, %(beneficio)s,
-             %(beneficio_post_log)s, %(porcentaje_ben_real)s, %(lineas_pedido)s,
-             %(porcentaje_pactado)s, %(usuario_id)s, now(), %(numero_albaran)s,
-             %(cantidad_pedidos)s)
-            RETURNING id, numero_albaran
+                (%(fecha)s, %(transportista_id)s, %(ruta_id)s, %(base_imponible)s,
+                %(importe_liquido)s, %(importe_transporte)s, %(beneficio)s,
+                %(beneficio_post_log)s, %(porcentaje_ben_real)s, %(lineas_pedido)s,
+                %(porcentaje_pactado)s, %(usuario_id)s, now(), %(numero_albaran)s,
+                %(cantidad_pedidos)s)
+                RETURNING id, numero_albaran
         """, data)
-        
+            
         result = cur.fetchone()
         conn.commit()
         return {'id': result[0], 'numero_albaran': result[1]}
@@ -242,7 +242,7 @@ def get_rutas():
     cur = conn.cursor()
     try:
         cur.execute("""
-            SELECT id, nombre_ruta, 
+            SELECT id, nombre_ruta as nombre, 
                    CASE 
                        WHEN UPPER(nombre_ruta) IN ('SAN FRANCISCO', 'MARGEN IZQUIERDA') THEN 4.00
                        WHEN UPPER(nombre_ruta) = 'PAMPLONA' THEN 6.00
@@ -250,17 +250,17 @@ def get_rutas():
                        ELSE 5.00
                    END as porcentaje_default
             FROM rutas 
-            WHERE activo = true 
-            ORDER BY nombre_ruta;
+            WHERE activo = true
+            ORDER BY nombre_ruta
         """)
-        return [
-            {
+        rutas = []
+        for row in cur.fetchall():
+            rutas.append({
                 'id': row[0],
                 'nombre': row[1],
                 'porcentaje_default': row[2]
-            }
-            for row in cur.fetchall()
-        ]
+            })
+        return rutas
     finally:
         cur.close()
         conn.close()
@@ -271,21 +271,19 @@ def get_transportistas():
     cur = conn.cursor()
     try:
         cur.execute("""
-            SELECT id, 
-                   nombres || ' ' || apellidos as nombre,
-                   telefono
+            SELECT id, nombres || ' ' || apellidos as nombre, telefono
             FROM transportistas 
-            WHERE activo = true 
-            ORDER BY nombres, apellidos;
+            WHERE activo = true
+            ORDER BY nombres, apellidos
         """)
-        return [
-            {
+        transportistas = []
+        for row in cur.fetchall():
+            transportistas.append({
                 'id': row[0],
                 'nombre': row[1],
                 'telefono': row[2]
-            }
-            for row in cur.fetchall()
-        ]
+            })
+        return transportistas
     finally:
         cur.close()
         conn.close()
