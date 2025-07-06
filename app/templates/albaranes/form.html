@@ -91,8 +91,8 @@
                                     <th>AYAD MOHAMED</th>
                                 </tr>
                             </thead>
-                            <tbody id="lineas-body">
-                                <!-- Aquí se cargarán las líneas dinámicamente -->
+                            <tbody id="lineas-resumen">
+                                <!-- Aquí se cargarán las líneas de resumen dinámicamente -->
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -105,9 +105,14 @@
                         </table>
                     </div>
 
-                    <!-- Sección de Líneas de Albarán -->
-                    <div id="lineas-form" class="mt-4">
-                        <h4>Líneas de Albarán</h4>
+                    <!-- Sección de Líneas de Albarán (inicialmente oculta) -->
+                    <div id="lineas-form" class="mt-4" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4>Líneas de Albarán</h4>
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-agregar-linea">
+                                <i class="fas fa-plus"></i> Agregar Línea
+                            </button>
+                        </div>
                         
                         <!-- Tabla de líneas -->
                         <div class="table-responsive">
@@ -164,6 +169,9 @@
                                                 </button>
                                                 <button class="btn btn-sm btn-primary btn-mas" disabled title="Finalizar y agregar nueva línea">
                                                     <i class="fas fa-plus"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger btn-eliminar" title="Eliminar línea">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             </td>
                                         </tr>
@@ -336,6 +344,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para cargar las líneas de la ruta
     async function cargarLineasRuta(rutaId, albaranId, porcentajePactado) {
+        // Guardar el porcentaje pactado globalmente
+        porcentajePactadoGlobal = porcentajePactado;
+        console.log(`DEBUG: Porcentaje pactado guardado globalmente: ${porcentajePactadoGlobal}`);
+        
         try {
             const response = await fetch(`/albaranes/api/lineas_ruta/${rutaId}`);
             if (!response.ok) {
@@ -349,40 +361,58 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const lineas = result.data;
-            const tbody = document.getElementById('lineas-body');
+            const tbody = document.getElementById('lineas-resumen');
             tbody.innerHTML = '';
             
-            let totalBeneficio = 0;
-            let totalImpLiqu = 0;
-            
-            lineas.forEach(linea => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="text-end">${parseFloat(linea.beneficio).toFixed(2)} €</td>
-                    <td class="text-end">${parseFloat(linea.imp_liqu).toFixed(2)} €</td>
-                    <td class="text-end">${parseFloat(linea.porcentaje).toFixed(2)}%</td>
-                    <td>${linea.conductor}</td>
-                `;
-                tbody.appendChild(tr);
-                
-                totalBeneficio += parseFloat(linea.beneficio);
-                totalImpLiqu += parseFloat(linea.imp_liqu);
-            });
-            
-            // Actualizar totales
-            document.getElementById('total-beneficio').textContent = totalBeneficio.toFixed(2) + ' €';
-            document.getElementById('total-imp-liqu').textContent = totalImpLiqu.toFixed(2) + ' €';
-            document.getElementById('porcentaje-promedio').textContent = porcentajePactado + '%';
-            
+            // No agregar línea automáticamente, solo mostrar tabla vacía
+            if (lineas.length === 0) {
+                // Solo mostrar la tabla vacía, sin agregar línea automáticamente
+                console.log('No hay líneas existentes. Tabla lista para agregar líneas manualmente.');
+            } else {
+                let totalBeneficio = 0;
+                let totalImpLiqu = 0;
+                lineas.forEach(linea => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="text-end">${parseFloat(linea.beneficio).toFixed(2)} €</td>
+                        <td class="text-end">${parseFloat(linea.imp_liqu).toFixed(2)} €</td>
+                        <td class="text-end">${parseFloat(linea.porcentaje).toFixed(2)}%</td>
+                        <td>${linea.conductor}</td>
+                    `;
+                    tbody.appendChild(tr);
+                    totalBeneficio += parseFloat(linea.beneficio);
+                    totalImpLiqu += parseFloat(linea.imp_liqu);
+                });
+                // Actualizar totales
+                document.getElementById('total-beneficio').textContent = totalBeneficio.toFixed(2) + ' €';
+                document.getElementById('total-imp-liqu').textContent = totalImpLiqu.toFixed(2) + ' €';
+                document.getElementById('porcentaje-promedio').textContent = porcentajePactado + '%';
+            }
+
             // Mostrar la tabla de líneas
             document.getElementById('lineas-albaran').style.display = 'block';
-            
-            // Deshabilitar el formulario de cabecera
+            // Mostrar la sección de líneas de albarán
+            document.getElementById('lineas-form').style.display = 'block';
+            // Deshabilitar solo algunos campos del formulario de cabecera
+            // Mantener editables: serie_alb, numero_alb, ruta_id, transportista_id, porcentaje_pactado
             document.querySelectorAll('#cabecera-form select, #cabecera-form input').forEach(el => {
-                el.disabled = true;
+                const camposEditables = ['serie_alb', 'numero_alb', 'ruta_id', 'transportista_id', 'porcentaje_pactado'];
+                if (!camposEditables.includes(el.name)) {
+                    el.disabled = true;
+                }
             });
             document.getElementById('btn-guardar').style.display = 'none';
-            
+
+            // Evento para el botón "Agregar Línea"
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'btn-agregar-linea') {
+                    agregarNuevaLinea();
+                }
+            });
+
+            // Configurar eventos para campos editables de la cabecera
+            configurarEventosCabeceraEditables();
+
         } catch (error) {
             console.error('Error:', error);
             alert(error.message || 'Error al cargar las líneas de la ruta');
@@ -392,7 +422,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modificar el manejador del formulario
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
         try {
             const formData = new FormData(this);
             const response = await fetch('/albaranes/nuevo', {
@@ -402,14 +431,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            
             if (!response.ok) throw new Error('Error en la respuesta del servidor');
-            
             const result = await response.json();
             if (result.success) {
-                // Mostrar mensaje de éxito
-                alert(result.message);
-                
                 // Cargar las líneas de la ruta
                 cargarLineasRuta(result.ruta_id, result.albaran_id, result.porcentaje_pactado);
             } else {
@@ -425,18 +449,204 @@ document.addEventListener('DOMContentLoaded', function() {
 // Cache para los resultados de la consulta SQL
 let albaranesCache = new Map();
 
-// Función para agregar nueva línea
+// Variable global para almacenar el porcentaje pactado
+let porcentajePactadoGlobal = 0;
+
+// Función para configurar eventos de campos editables de la cabecera
+function configurarEventosCabeceraEditables() {
+    // Campos editables de la cabecera
+    const serieAlbInput = document.querySelector('input[name="serie_alb"]');
+    const numeroAlbInput = document.querySelector('input[name="numero_alb"]');
+    const rutaSelect = document.querySelector('select[name="ruta_id"]');
+    const transportistaSelect = document.querySelector('select[name="transportista_id"]');
+    const porcentajePactadoInput = document.querySelector('input[name="porcentaje_pactado"]');
+
+    // Evento para buscar albarán cuando cambien serie o número
+    function buscarAlbaranCabecera() {
+        const serie = serieAlbInput.value.trim();
+        const numero = numeroAlbInput.value.trim();
+        
+        if (serie && numero) {
+            // Buscar el albarán y actualizar campos automáticamente
+            buscarAlbaranAPI(serie, numero).then(data => {
+                if (data.success) {
+                    // Actualizar campos de solo lectura con los nuevos datos
+                    actualizarCamposCabecera(data.data);
+                    // Recalcular todos los campos derivados
+                    recalcularTodosCampos();
+                }
+            }).catch(error => {
+                console.error('Error al buscar albarán:', error);
+            });
+        }
+    }
+
+    // Función para actualizar campos de la cabecera con nuevos datos
+    function actualizarCamposCabecera(data) {
+        document.querySelector('input[name="nombre_cliente"]').value = data.nombre_cliente || '';
+        document.querySelector('input[name="cod_cliente"]').value = data.cod_cliente || '';
+        document.querySelector('input[name="municipio_envio"]').value = data.municipio_envio || '';
+        document.querySelector('input[name="imp_liqu"]').value = formatearNumero(data.imp_liqu) || '';
+        document.querySelector('input[name="fecha_alb"]').value = formatearFecha(data.fecha_alb) || '';
+        document.querySelector('input[name="beneficio"]').value = formatearNumero(data.beneficio) || '';
+        document.querySelector('input[name="porcentaje"]').value = formatearNumero(data.porcentaje) || '';
+        document.querySelector('input[name="conductor"]').value = data.conductor || '';
+        document.querySelector('input[name="importe"]').value = formatearNumero(data.importe) || '';
+        document.querySelector('input[name="lineas"]').value = data.lineas || '';
+        document.querySelector('input[name="deuda"]').value = formatearDeuda(data.deuda) || '';
+    }
+
+    // Eventos para los campos editables
+    if (serieAlbInput) {
+        serieAlbInput.addEventListener('change', buscarAlbaranCabecera);
+        serieAlbInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab' || e.key === 'Enter') {
+                e.preventDefault();
+                numeroAlbInput.focus();
+                numeroAlbInput.select();
+            }
+        });
+    }
+
+    if (numeroAlbInput) {
+        numeroAlbInput.addEventListener('change', buscarAlbaranCabecera);
+        numeroAlbInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                buscarAlbaranCabecera();
+            }
+        });
+    }
+
+    if (porcentajePactadoInput) {
+        porcentajePactadoInput.addEventListener('input', function() {
+            // Actualizar variable global
+            porcentajePactadoGlobal = parseFloat(this.value) || 0;
+            // Recalcular todos los campos derivados
+            recalcularTodosCampos();
+        });
+    }
+
+    if (rutaSelect) {
+        rutaSelect.addEventListener('change', function() {
+            // Aquí se podría agregar lógica adicional si es necesario
+            console.log('Ruta cambiada a:', this.value);
+        });
+    }
+
+    if (transportistaSelect) {
+        transportistaSelect.addEventListener('change', function() {
+            // Aquí se podría agregar lógica adicional si es necesario
+            console.log('Transportista cambiado a:', this.value);
+        });
+    }
+}
+
+// Función para buscar albarán mediante API
+async function buscarAlbaranAPI(serie, numero) {
+    try {
+        const cacheKey = `${serie}-${numero}`;
+        let datos;
+
+        if (albaranesCache.has(cacheKey)) {
+            datos = albaranesCache.get(cacheKey);
+        } else {
+            const response = await fetch(`/albaranes/api/buscar_albaran/${serie}/${numero}`);
+            if (!response.ok) {
+                throw new Error('No se encontró el albarán');
+            }
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.message || 'Error al buscar el albarán');
+            }
+            datos = result.data;
+            albaranesCache.set(cacheKey, datos);
+        }
+
+        return { success: true, data: datos };
+    } catch (error) {
+        console.error('Error al buscar albarán:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+// Función para recalcular todos los campos derivados
+function recalcularTodosCampos() {
+    // Recalcular TLPA y otros campos derivados en la cabecera
+    const importe = parseFloat(document.querySelector('input[name="importe"]').value) || 0;
+    const porcentaje = porcentajePactadoGlobal || parseFloat(document.querySelector('input[name="porcentaje_pactado"]').value) || 0;
+    const beneficio = parseFloat(document.querySelector('input[name="beneficio"]').value) || 0;
+    
+    if (importe > 0 && porcentaje > 0) {
+        const tlpa = importe * (porcentaje / 100);
+        const benPostLog = beneficio - tlpa;
+        const porcentajeBenReal = (benPostLog / importe) * 100;
+        
+        // Actualizar campos calculados
+        document.querySelector('input[name="tlpa"]').value = formatearNumero(tlpa);
+        document.querySelector('input[name="ben_post_log"]').value = formatearNumero(benPostLog);
+        document.querySelector('input[name="porcentaje_ben_real"]').value = formatearNumero(porcentajeBenReal);
+    }
+    
+    // Recalcular totales de las líneas
+    recalcularTotales();
+}
+
+// Mejorar la función agregarNuevaLinea para experiencia tipo Excel
 function agregarNuevaLinea() {
     const template = document.getElementById('linea-template');
     const nuevaLinea = template.content.cloneNode(true);
+    const tr = nuevaLinea.querySelector('tr');
+    
+    // Limpiar todos los campos
+    tr.querySelectorAll('span').forEach(span => span.textContent = '');
+    tr.querySelectorAll('input').forEach(input => {
+        if (input.classList.contains('serie-alb') || input.classList.contains('numero-alb')) {
+            input.value = '';
+            input.readOnly = false;
+            input.style.backgroundColor = '#ffffff';
+            input.style.border = '2px solid #007bff';
+        } else if (input.classList.contains('importe')) {
+            input.value = '';
+            input.readOnly = true;
+            input.style.backgroundColor = '#f8f9fa';
+        }
+    });
+    
+    // Deshabilitar botones hasta que se complete la línea
+    tr.querySelector('.btn-ok').disabled = true;
+    tr.querySelector('.btn-mas').disabled = true;
+    tr.querySelector('.edit-importe').style.display = 'none';
+    
+    // Agregar la línea al tbody
     document.getElementById('lineas-body').appendChild(nuevaLinea);
     
     // Configurar eventos para la nueva línea
     const ultimaLinea = document.querySelector('#lineas-body tr:last-child');
     configurarEventosLinea(ultimaLinea);
+    
+    // Enfocar el input de serie y añadir placeholder
+    const serieInput = ultimaLinea.querySelector('.serie-alb');
+    const numeroInput = ultimaLinea.querySelector('.numero-alb');
+    
+    serieInput.placeholder = 'Serie...';
+    numeroInput.placeholder = 'Número...';
+    
+    setTimeout(() => {
+        serieInput.focus();
+        serieInput.select();
+    }, 100);
+    
+    // Evento para pasar al siguiente campo con Tab o Enter
+    serieInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab' || e.key === 'Enter') {
+            e.preventDefault();
+            numeroInput.focus();
+            numeroInput.select();
+        }
+    });
 }
 
-// Función para configurar eventos de una línea
+// Función para configurar eventos de una línea (mejorada para experiencia Excel)
 function configurarEventosLinea(lineaElement) {
     const serieInput = lineaElement.querySelector('.serie-alb');
     const numeroInput = lineaElement.querySelector('.numero-alb');
@@ -444,6 +654,36 @@ function configurarEventosLinea(lineaElement) {
     const editImporteBtn = lineaElement.querySelector('.edit-importe');
     const btnOk = lineaElement.querySelector('.btn-ok');
     const btnMas = lineaElement.querySelector('.btn-mas');
+    const btnEliminar = lineaElement.querySelector('.btn-eliminar');
+
+    // Función para verificar si la línea está completa
+    function verificarLineaCompleta() {
+        const serie = serieInput.value.trim();
+        const numero = numeroInput.value.trim();
+        const importe = importeInput.value.trim();
+        
+        if (serie && numero && importe) {
+            btnOk.disabled = false;
+            btnMas.disabled = false;
+            editImporteBtn.style.display = 'inline-block';
+            // Cambiar color de borde a verde para indicar completado
+            serieInput.style.border = '2px solid #28a745';
+            numeroInput.style.border = '2px solid #28a745';
+        } else {
+            btnOk.disabled = true;
+            btnMas.disabled = true;
+            editImporteBtn.style.display = 'none';
+        }
+    }
+
+    // Evento para eliminar línea
+    btnEliminar.addEventListener('click', () => {
+        if (confirm('¿Está seguro de eliminar esta línea?')) {
+            lineaElement.remove();
+            // Recalcular totales después de eliminar
+            recalcularTotales();
+        }
+    });
 
     // Evento para buscar albarán al presionar Enter en numero-alb
     numeroInput.addEventListener('keypress', async (e) => {
@@ -452,9 +692,55 @@ function configurarEventosLinea(lineaElement) {
             const numero = numeroInput.value.trim();
             
             if (serie && numero) {
-                await buscarYRellenarDatos(serie, numero, lineaElement);
+                // Mostrar indicador de carga
+                numeroInput.style.backgroundColor = '#fff3cd';
+                numeroInput.value = 'Buscando...';
+                numeroInput.disabled = true;
+                
+                try {
+                    await buscarYRellenarDatos(serie, numero, lineaElement);
+                    verificarLineaCompleta();
+                } catch (error) {
+                    // Restaurar estado si hay error
+                    numeroInput.style.backgroundColor = '#ffffff';
+                    numeroInput.value = numero;
+                    numeroInput.disabled = false;
+                    numeroInput.focus();
+                }
+            } else {
+                // Enfocar el campo vacío sin alert
+                if (!serie) {
+                    serieInput.focus();
+                    serieInput.style.border = '2px solid #dc3545';
+                } else {
+                    numeroInput.focus();
+                    numeroInput.style.border = '2px solid #dc3545';
+                }
             }
         }
+    });
+
+    // Eventos para validar completitud al cambiar valores
+    serieInput.addEventListener('input', () => {
+        verificarLineaCompleta();
+        // Recalcular campos cuando cambie el importe
+        if (importeInput.value) {
+            recalcularCampos(lineaElement);
+        }
+    });
+    
+    numeroInput.addEventListener('input', () => {
+        verificarLineaCompleta();
+        // Recalcular campos cuando cambie el importe
+        if (importeInput.value) {
+            recalcularCampos(lineaElement);
+        }
+    });
+    
+    importeInput.addEventListener('input', () => {
+        verificarLineaCompleta();
+        // Recalcular campos automáticamente cuando cambie el importe
+        recalcularCampos(lineaElement);
     });
 
     // Evento para el botón de editar importe
@@ -466,21 +752,34 @@ function configurarEventosLinea(lineaElement) {
         // Configurar evento del botón confirmar
         document.getElementById('confirmarImporte').onclick = () => {
             const nuevoImporte = document.getElementById('nuevoImporte').value;
-            importeInput.value = nuevoImporte;
-            recalcularCampos(lineaElement);
+            if (nuevoImporte && nuevoImporte !== importeActual) {
+                importeInput.value = nuevoImporte;
+                recalcularCampos(lineaElement);
+                verificarLineaCompleta();
+            }
             modal.hide();
         };
         
         modal.show();
     });
 
-    // Eventos para los botones OK y Más
-    btnOk.addEventListener('click', () => finalizarLinea(lineaElement, false));
-    btnMas.addEventListener('click', () => finalizarLinea(lineaElement, true));
+    // Eventos para los botones OK y Más (corregidos)
+    btnOk.addEventListener('click', (e) => {
+        e.preventDefault();
+        finalizarLinea(lineaElement, false);
+    });
+    
+    btnMas.addEventListener('click', (e) => {
+        e.preventDefault();
+        finalizarLinea(lineaElement, true);
+    });
 }
 
-// Función para buscar y rellenar datos
+// Función para buscar y rellenar datos (mejorada)
 async function buscarYRellenarDatos(serie, numero, lineaElement) {
+    const numeroInput = lineaElement.querySelector('.numero-alb');
+    const serieInput = lineaElement.querySelector('.serie-alb');
+    
     try {
         const cacheKey = `${serie}-${numero}`;
         let datos;
@@ -489,31 +788,89 @@ async function buscarYRellenarDatos(serie, numero, lineaElement) {
             datos = albaranesCache.get(cacheKey);
         } else {
             const response = await fetch(`/albaranes/api/buscar_albaran/${serie}/${numero}`);
-            if (!response.ok) throw new Error('No se encontró el albarán');
-            datos = await response.json();
+            if (!response.ok) {
+                throw new Error('No se encontró el albarán');
+            }
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.message || 'Error al buscar el albarán');
+            }
+            datos = result.data;
             albaranesCache.set(cacheKey, datos);
         }
 
+        // Restaurar el estado normal de los inputs
+        numeroInput.style.backgroundColor = '#ffffff';
+        numeroInput.value = numero;
+        numeroInput.disabled = false;
+        
+        // Rellenar datos en la línea
         rellenarDatosLinea(lineaElement, datos);
+        
+        // Indicar éxito visualmente
+        serieInput.style.backgroundColor = '#d4edda';
+        numeroInput.style.backgroundColor = '#d4edda';
+        
+        setTimeout(() => {
+            serieInput.style.backgroundColor = '#ffffff';
+            numeroInput.style.backgroundColor = '#ffffff';
+        }, 1000);
+        
     } catch (error) {
+        // Restaurar estado y mostrar error
+        numeroInput.style.backgroundColor = '#f8d7da';
+        numeroInput.value = numero;
+        numeroInput.disabled = false;
+        
+        setTimeout(() => {
+            numeroInput.style.backgroundColor = '#ffffff';
+        }, 2000);
+        
         alert(error.message);
+        throw error; // Re-lanzar para que el llamador pueda manejarlo
     }
+}
+
+// Función auxiliar para formatear fecha a dd/mm/aaaa
+function formatearFecha(fechaString) {
+    if (!fechaString) return '';
+    
+    const fecha = new Date(fechaString);
+    if (isNaN(fecha.getTime())) return fechaString;
+    
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const año = fecha.getFullYear();
+    return `${dia}/${mes}/${año}`;
+}
+
+// Función auxiliar para formatear números con 2 decimales
+function formatearNumero(numero) {
+    if (numero === null || numero === undefined || numero === '') return '0.00';
+    return parseFloat(numero).toFixed(2);
+}
+
+// Función auxiliar para formatear deuda
+function formatearDeuda(deuda) {
+    if (!deuda || deuda === null) return '0.00€';
+    if (typeof deuda === 'string' && deuda.includes('€')) return deuda;
+    return formatearNumero(deuda) + '€';
 }
 
 // Función para rellenar datos en la línea
 function rellenarDatosLinea(lineaElement, datos) {
-    // Rellenar campos con los datos
-    lineaElement.querySelector('.fecha-alb').textContent = datos.fecha_alb;
-    lineaElement.querySelector('.nombre-cliente').textContent = datos.nombre_cliente;
-    lineaElement.querySelector('.cod-cliente').textContent = datos.cod_cliente;
-    lineaElement.querySelector('.municipio-envio').textContent = datos.municipio_envio;
-    lineaElement.querySelector('.importe').value = datos.importe;
-    lineaElement.querySelector('.beneficio').textContent = datos.beneficio;
-    lineaElement.querySelector('.imp-liqu').textContent = datos.imp_liqu;
-    lineaElement.querySelector('.porcentaje').textContent = datos.porcentaje;
-    lineaElement.querySelector('.conductor').textContent = datos.conductor;
-    lineaElement.querySelector('.deuda').textContent = datos.deuda;
-    lineaElement.querySelector('.lineas').textContent = datos.lineas;
+    // Rellenar campos con los datos formateados
+    lineaElement.querySelector('.fecha-alb').textContent = formatearFecha(datos.fecha_alb);
+    lineaElement.querySelector('.nombre-cliente').textContent = datos.nombre_cliente || '';
+    lineaElement.querySelector('.cod-cliente').textContent = datos.cod_cliente || '';
+    lineaElement.querySelector('.municipio-envio').textContent = datos.municipio_envio || '';
+    lineaElement.querySelector('.importe').value = formatearNumero(datos.importe);
+    lineaElement.querySelector('.beneficio').textContent = formatearNumero(datos.beneficio);
+    lineaElement.querySelector('.imp-liqu').textContent = formatearNumero(datos.imp_liqu);
+    lineaElement.querySelector('.porcentaje').textContent = formatearNumero(datos.porcentaje);
+    lineaElement.querySelector('.conductor').textContent = datos.conductor || '';
+    lineaElement.querySelector('.deuda').textContent = formatearDeuda(datos.deuda);
+    lineaElement.querySelector('.lineas').textContent = datos.lineas || '0';
 
     // Calcular campos derivados
     recalcularCampos(lineaElement);
@@ -523,60 +880,159 @@ function rellenarDatosLinea(lineaElement, datos) {
     lineaElement.querySelector('.btn-mas').disabled = false;
 }
 
-// Función para recalcular campos
+// Función para recalcular campos (mejorada)
 function recalcularCampos(lineaElement) {
     const importe = parseFloat(lineaElement.querySelector('.importe').value) || 0;
-    const porcentajePactado = parseFloat(document.getElementById('porcentaje-pactado').value) || 0;
+    
+    // Intentar obtener el porcentaje pactado de diferentes fuentes
+    let porcentajePactado = 0;
+    const porcentajePactadoElement = document.getElementById('porcentaje_pactado');
+    
+    if (porcentajePactadoElement && porcentajePactadoElement.value) {
+        porcentajePactado = parseFloat(porcentajePactadoElement.value) || 0;
+    } else if (porcentajePactadoGlobal > 0) {
+        // Usar la variable global como respaldo
+        porcentajePactado = porcentajePactadoGlobal;
+    } else {
+        // Si el campo está deshabilitado, intentar obtenerlo del texto mostrado
+        const porcentajePromedioElement = document.getElementById('porcentaje-promedio');
+        if (porcentajePromedioElement && porcentajePromedioElement.textContent) {
+            const textoPromedio = porcentajePromedioElement.textContent.replace('%', '');
+            porcentajePactado = parseFloat(textoPromedio) || 0;
+        }
+    }
+    
+    console.log(`DEBUG TLPA: importe=${importe}, porcentajePactado=${porcentajePactado}, elemento encontrado=${!!porcentajePactadoElement}, valor del elemento=${porcentajePactadoElement ? porcentajePactadoElement.value : 'NO ENCONTRADO'}`);
     
     // Calcular TLPA
     const tlpa = importe * (porcentajePactado / 100);
-    lineaElement.querySelector('.tlpa').textContent = tlpa.toFixed(2);
+    const tlpaElement = lineaElement.querySelector('.tlpa');
+    console.log(`DEBUG TLPA: calculado=${tlpa}, elemento encontrado=${!!tlpaElement}`);
+    if (tlpaElement) {
+        tlpaElement.textContent = formatearNumero(tlpa);
+        console.log(`DEBUG TLPA: valor asignado=${tlpaElement.textContent}`);
+    }
     
     // Calcular Beneficio Post-Logístico
-    const beneficio = parseFloat(lineaElement.querySelector('.beneficio').textContent) || 0;
+    const beneficioElement = lineaElement.querySelector('.beneficio');
+    const beneficio = parseFloat(beneficioElement ? beneficioElement.textContent : 0) || 0;
     const benPostLog = beneficio - tlpa;
-    lineaElement.querySelector('.ben-post-log').textContent = benPostLog.toFixed(2);
+    const benPostLogElement = lineaElement.querySelector('.ben-post-log');
+    if (benPostLogElement) {
+        benPostLogElement.textContent = formatearNumero(benPostLog);
+    }
     
     // Calcular Porcentaje Beneficio Real
     const porBenReal = importe !== 0 ? (benPostLog / importe) * 100 : 0;
-    lineaElement.querySelector('.por-ben-real').textContent = porBenReal.toFixed(2);
+    const porBenRealElement = lineaElement.querySelector('.por-ben-real');
+    if (porBenRealElement) {
+        porBenRealElement.textContent = formatearNumero(porBenReal);
+    }
+    
+    // Recalcular totales de la cabecera
+    recalcularTotales();
 }
 
-// Función para finalizar línea
+// Función para finalizar línea (corregida)
 function finalizarLinea(lineaElement, agregarNueva) {
-    // Deshabilitar inputs
-    lineaElement.querySelectorAll('input').forEach(input => input.readOnly = true);
-    lineaElement.querySelectorAll('button').forEach(btn => btn.disabled = true);
+    // Verificar que la línea esté completa antes de finalizar
+    const serie = lineaElement.querySelector('.serie-alb').value.trim();
+    const numero = lineaElement.querySelector('.numero-alb').value.trim();
+    const importe = lineaElement.querySelector('.importe').value.trim();
+    
+    if (!serie || !numero || !importe) {
+        // Resaltar campos faltantes
+        if (!serie) lineaElement.querySelector('.serie-alb').style.border = '2px solid #dc3545';
+        if (!numero) lineaElement.querySelector('.numero-alb').style.border = '2px solid #dc3545';
+        if (!importe) lineaElement.querySelector('.importe').style.border = '2px solid #dc3545';
+        return;
+    }
+    
+    // Marcar la línea como finalizada
+    lineaElement.classList.add('linea-finalizada');
+    
+    // Hacer los inputs de solo lectura
+    lineaElement.querySelectorAll('input').forEach(input => {
+        input.readOnly = true;
+        input.style.backgroundColor = '#f8f9fa';
+        input.style.border = '1px solid #dee2e6';
+    });
+    
+    // Deshabilitar botones de la línea
+    lineaElement.querySelector('.btn-ok').disabled = true;
+    lineaElement.querySelector('.btn-mas').disabled = true;
+    lineaElement.querySelector('.edit-importe').style.display = 'none';
     
     // Actualizar totales de la cabecera
-    actualizarTotalesCabecera();
+    recalcularTotales();
     
+    // Agregar nueva línea si se solicitó
     if (agregarNueva) {
-        agregarNuevaLinea();
+        setTimeout(() => {
+            agregarNuevaLinea();
+        }, 100);
     }
 }
 
-// Función para actualizar totales de la cabecera
-function actualizarTotalesCabecera() {
+// Función para actualizar totales de la cabecera (mejorada)
+function recalcularTotales() {
     let totalBeneficio = 0;
     let totalImpLiqu = 0;
     let totalTLPA = 0;
+    let totalLineas = 0;
     
-    document.querySelectorAll('.linea-albaran').forEach(linea => {
-        totalBeneficio += parseFloat(linea.querySelector('.beneficio').textContent) || 0;
-        totalImpLiqu += parseFloat(linea.querySelector('.imp-liqu').textContent) || 0;
-        totalTLPA += parseFloat(linea.querySelector('.tlpa').textContent) || 0;
+    // Recorrer todas las líneas que tienen datos
+    document.querySelectorAll('#lineas-body tr.linea-albaran').forEach(linea => {
+        const beneficioElement = linea.querySelector('.beneficio');
+        const impLiquElement = linea.querySelector('.imp-liqu');
+        const tlpaElement = linea.querySelector('.tlpa');
+        
+        if (beneficioElement && beneficioElement.textContent) {
+            const beneficio = parseFloat(beneficioElement.textContent) || 0;
+            totalBeneficio += beneficio;
+        }
+        
+        if (impLiquElement && impLiquElement.textContent) {
+            const impLiqu = parseFloat(impLiquElement.textContent) || 0;
+            totalImpLiqu += impLiqu;
+        }
+        
+        if (tlpaElement && tlpaElement.textContent) {
+            const tlpa = parseFloat(tlpaElement.textContent) || 0;
+            totalTLPA += tlpa;
+        }
+        
+        // Contar líneas que tienen datos
+        const serie = linea.querySelector('.serie-alb').value.trim();
+        const numero = linea.querySelector('.numero-alb').value.trim();
+        if (serie && numero) {
+            totalLineas++;
+        }
     });
     
-    // Actualizar totales en la cabecera
-    document.getElementById('total-beneficio').textContent = totalBeneficio.toFixed(2);
-    document.getElementById('total-imp-liqu').textContent = totalImpLiqu.toFixed(2);
-    document.getElementById('total-tlpa').textContent = totalTLPA.toFixed(2);
+    // Actualizar totales en la tabla de resumen con formato Excel
+    const totalBeneficioElement = document.getElementById('total-beneficio');
+    const totalImpLiquElement = document.getElementById('total-imp-liqu');
+    const totalTLPAElement = document.getElementById('total-tlpa');
+    
+    if (totalBeneficioElement) {
+        totalBeneficioElement.textContent = formatearNumero(totalBeneficio);
+    }
+    if (totalImpLiquElement) {
+        totalImpLiquElement.textContent = formatearNumero(totalImpLiqu);
+    }
+    if (totalTLPAElement) {
+        totalTLPAElement.textContent = formatearNumero(totalTLPA);
+    }
+    
+    // Calcular porcentaje total
+    const porcentajeTotalElement = document.getElementById('porcentaje-total');
+    if (porcentajeTotalElement && totalImpLiqu > 0) {
+        const porcentajeTotal = (totalBeneficio / totalImpLiqu) * 100;
+        porcentajeTotalElement.textContent = formatearNumero(porcentajeTotal) + '%';
+    }
+    
+    console.log(`Totales recalculados: Beneficio: ${totalBeneficio.toFixed(2)}€, Imp. Líquido: ${totalImpLiqu.toFixed(2)}€, TLPA: ${totalTLPA.toFixed(2)}€, Líneas: ${totalLineas}`);
 }
-
-// Inicializar primera línea al cargar
-document.addEventListener('DOMContentLoaded', () => {
-    agregarNuevaLinea();
-});
 </script>
 {% endblock %}

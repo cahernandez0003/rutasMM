@@ -1,7 +1,12 @@
-# Entorno virtual
+# Entornos virtuales de Python
 .venv/
 venv/
+env/
 ENV/
+
+# Archivos de configuración local
+.env
+.env.local
 
 # Archivos de Python
 __pycache__/
@@ -24,6 +29,37 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Archivos de base de datos locales
+*.db
+*.sqlite
+*.sqlite3
+
+# Archivos de configuración específicos del entorno
+config_local.py
+settings_local.py
 
 # Logs y bases de datos
 *.log
